@@ -1,0 +1,15 @@
+---
+applications:
+- name: auth-gateway
+  buildpack: java_buildpack
+  path: target/auth-gateway-engine-${version}.jar
+  services:
+  - kerberos-service
+  - zk-inst-plan-bare
+  - hdfs-inst-plan-bare
+  env:
+    HDFS_SUPERUSER: hdfs
+    HDFS_KEYTAB: placeholder
+    VERSION: ${version}
+    SPRING_PROFILES_ACTIVE: cloud,zookeeper-auth-gateway,hdfs-auth-gateway
+

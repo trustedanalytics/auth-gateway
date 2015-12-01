@@ -1,0 +1,7 @@
+engine:
+  timeout: 10
+hdfs:
+  clientKeytab: ${hdfs.keytab:}
+  superUser: ${hdfs.superuser:}
+
+logging.level.org.apache.zookeeper: DEBUG

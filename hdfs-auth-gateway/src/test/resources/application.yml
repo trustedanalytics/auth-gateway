@@ -1,0 +1,3 @@
+hdfs:
+  clientKeytab: ${hdfs.keytab:}
+  superUser: ${hdfs.superuser:super}
