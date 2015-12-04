@@ -24,6 +24,7 @@
         <module>auth-gateway-engine</module>
         <module>zookeeper-auth-gateway</module>
         <module>hdfs-auth-gateway</module>
+        <module>sentry-client</module>
     </modules>
 
     <dependencies>

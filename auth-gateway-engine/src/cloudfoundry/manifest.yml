@@ -10,6 +10,10 @@ applications:
   env:
     HDFS_SUPERUSER: hdfs
     HDFS_KEYTAB: placeholder
+    SENTRY_KEYTAB: placeholder
+    SENTRY_ADDRESS: placeholder
+    SENTRY_PORT: placeholder
+    SENTRY_PRINCIPAL: placeholder
+    SENTRY_SUPERUSER: placeholder
     VERSION: ${version}
-    SPRING_PROFILES_ACTIVE: cloud,zookeeper-auth-gateway,hdfs-auth-gateway
-
+    SPRING_PROFILES_ACTIVE: cloud,zookeeper-auth-gateway,hdfs-auth-gateway,sentry-auth-gateway

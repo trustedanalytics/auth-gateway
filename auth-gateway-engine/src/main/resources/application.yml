@@ -3,5 +3,12 @@ engine:
 hdfs:
   clientKeytab: ${hdfs.keytab:}
   superUser: ${hdfs.superuser:}
+sentry.server:
+  address: ${sentry.address:}
+  port: ${sentry.port:8038}
+  principal: ${sentry.principal:sentry}
+sentry.client:
+  clientKeyTab: ${sentry.keytab:}
+  superUser: ${sentry.superuser:hive}
 
 logging.level.org.apache.zookeeper: DEBUG
