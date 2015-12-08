@@ -39,6 +39,19 @@ Hdfs provider is an optional part of the gateway, which is responsible for creat
 * **Configuration without Kerberos**
   
   When hdfs provider running without kerberos it not require HDFS_KEYTAB, HDFS_SUPERUSER will be used as a name of superuser in hdfs.
+  
+#### Sentry provider
+Sentry provider can work only in kerberos environment. For non-kerberos deployments do not add "sentry-auth-gateway" profile to
+SPRING_PROFILES_ACTIVE environment variable. Sentry provider is responsible for managing sentry roles (Role-Base Administration). 
+In actual implementation (for corss-organizations isolation) one sentry role is created for every new organization. Created role 
+is granted to groups: org, org_admin.
+
+* **Configuration with Kerberos**
+  * SENTRY_ADDRESS: address where sentry service listen on 
+  * SENTRY_PORT: port where sentry service listen on (default: 8038)
+  * SENTRY_PRINCIPAL: service principal name defined for sentry service (default: sentry)
+  * SENTRY_SUPERUSER: principal name on whose behalf sentry provider connect to sentry service (default: hive)
+  * SENTRY_KEYTAB: keytab file for principal SENTRY_SUPERUSER as base64 
 
 #### Zookeeper provider
 

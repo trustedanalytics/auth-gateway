@@ -57,6 +57,8 @@ public class CustomSentryPolicyServiceClient {
 
   public static final String HOST_PLACEHOLDER = "/_HOST@";
 
+  public static final String ADMIN_ORG_GROUP_POSTFIX = "_admin";
+
   private SentryPolicyService.Client client;
 
   private String address;
@@ -133,7 +135,10 @@ public class CustomSentryPolicyServiceClient {
     TAlterSentryRoleAddGroupsRequest request =
         new TAlterSentryRoleAddGroupsRequest(
             ServiceConstants.ThriftConstants.TSENTRY_SERVICE_VERSION_CURRENT,
-            superUser, roleName, Sets.newHashSet(new TSentryGroup(groupName)));
+            superUser,
+            roleName,
+            Sets.newHashSet(new TSentryGroup(groupName),
+                            new TSentryGroup(groupName.concat(ADMIN_ORG_GROUP_POSTFIX))));
     try {
       TAlterSentryRoleAddGroupsResponse response = client.alter_sentry_role_add_groups(request);
       Status.throwIfNotOk(response.getStatus());
