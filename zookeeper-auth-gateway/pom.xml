@@ -5,7 +5,7 @@
     <parent>
         <artifactId>auth-gateway</artifactId>
         <groupId>org.trustedanalytics</groupId>
-        <version>0.4.0</version>
+        <version>0.4.2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -22,7 +22,7 @@
         <dependency>
             <groupId>org.trustedanalytics</groupId>
             <artifactId>auth-gateway-spi</artifactId>
-            <version>0.4.0</version>
+            <version>0.4.2</version>
         </dependency>
         <dependency>
             <groupId>org.apache.curator</groupId>
