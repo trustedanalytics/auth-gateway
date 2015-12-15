@@ -41,7 +41,7 @@ public class HdfsGateway implements Authorizable {
   private HdfsClient hdfsClient;
 
   @Override
-  public void addOrganization(String orgId, String orgName) throws AuthorizableGatewayException {
+  public void addOrganization(String orgId) throws AuthorizableGatewayException {
     try {
       hdfsClient.createDirectory(pathCreator.createOrgPath(orgId), orgId.concat(ADMIN_POSTFIX),
           orgId, HdfsPermission.USER_ONLY.getPermission());
@@ -62,7 +62,7 @@ public class HdfsGateway implements Authorizable {
   }
 
   @Override
-  public void removeOrganization(String orgId, String orgName) throws AuthorizableGatewayException {
+  public void removeOrganization(String orgId) throws AuthorizableGatewayException {
     try {
       hdfsClient.deleteDirectory(pathCreator.createOrgPath(orgId));
     } catch (IOException e) {
@@ -91,10 +91,10 @@ public class HdfsGateway implements Authorizable {
   }
 
   @Override
-  public void addUser(String userId, String userName) throws AuthorizableGatewayException {}
+  public void addUser(String userId) throws AuthorizableGatewayException {}
 
   @Override
-  public void removeUser(String userId, String userName) throws AuthorizableGatewayException {}
+  public void removeUser(String userId) throws AuthorizableGatewayException {}
 
   @Override
   public String getName() {

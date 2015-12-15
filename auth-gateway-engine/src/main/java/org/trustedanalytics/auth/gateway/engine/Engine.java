@@ -38,20 +38,20 @@ class Engine {
         this.timeoutInSeconds = timeoutInSeconds;
     }
 
-    public void addUser(String userId, String userName) throws AuthorizableGatewayException {
+    public void addUser(String userId) throws AuthorizableGatewayException {
         List<CompletableFuture<Void>> tasks = new LinkedList<>();
         for (Authorizable authorizable : supportedAuthorizables) {
-            tasks.add(createFutureForMethod(() -> authorizable.addUser(userId, userName),
+            tasks.add(createFutureForMethod(() -> authorizable.addUser(userId),
                 authorizable.getName(), "adding user"));
         }
 
         runTasks(tasks, "Error adding user");
     }
 
-    public void addOrganization(String orgId, String orgName) throws AuthorizableGatewayException {
+    public void addOrganization(String orgId) throws AuthorizableGatewayException {
         List<CompletableFuture<Void>> tasks = new LinkedList<>();
         for (Authorizable authorizable : supportedAuthorizables) {
-            tasks.add(createFutureForMethod(() -> authorizable.addOrganization(orgId, orgName),
+            tasks.add(createFutureForMethod(() -> authorizable.addOrganization(orgId),
                 authorizable.getName(), "adding organization"));
         }
 
@@ -68,21 +68,21 @@ class Engine {
         runTasks(tasks, "Error adding user to organization");
     }
 
-    public void removeUser(String userId, String userName) throws AuthorizableGatewayException {
+    public void removeUser(String userId) throws AuthorizableGatewayException {
         List<CompletableFuture<Void>> tasks = new LinkedList<>();
         for (Authorizable authorizable : supportedAuthorizables) {
-            tasks.add(createFutureForMethod(() -> authorizable.removeUser(userId, userName),
+            tasks.add(createFutureForMethod(() -> authorizable.removeUser(userId),
                 authorizable.getName(), "removing user"));
         }
 
         runTasks(tasks, "Error removing user");
     }
 
-    public void removeOrganization(String orgId, String orgName)
+    public void removeOrganization(String orgId)
         throws AuthorizableGatewayException {
         List<CompletableFuture<Void>> tasks = new LinkedList<>();
         for (Authorizable authorizable : supportedAuthorizables) {
-            tasks.add(createFutureForMethod(() -> authorizable.removeOrganization(orgId, orgName),
+            tasks.add(createFutureForMethod(() -> authorizable.removeOrganization(orgId),
                 authorizable.getName(), "removing organization"));
         }
 

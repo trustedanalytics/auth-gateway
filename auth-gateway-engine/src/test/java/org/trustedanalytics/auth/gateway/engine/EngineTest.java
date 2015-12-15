@@ -34,9 +34,7 @@ import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
 public class EngineTest {
 
     private static final String USER_ID = "666";
-    private static final String USER_NAME = "laksj";
     private static final String ORG_ID = "897351";
-    private static final String ORG_NAME = "alkheaefg";
     private static final String EXCEPTION_MESSAGE = "Something went wrong";
     private static final String AUTHORIZABLE1_NAME = "AUTH_1";
     private static final String AUTHORIZABLE2_NAME = "AUTH_2";
@@ -66,18 +64,18 @@ public class EngineTest {
         Engine engine = new Engine(listOfAuthorizables, ENGINE_TIMEOUT_IN_SECONDS);
 
         // when
-        engine.addUser(USER_ID, USER_NAME);
+        engine.addUser(USER_ID);
 
         // then
-        verify(authorizableMock1).addUser(USER_ID, USER_NAME);
-        verify(authorizableMock2).addUser(USER_ID, USER_NAME);
+        verify(authorizableMock1).addUser(USER_ID);
+        verify(authorizableMock2).addUser(USER_ID);
     }
 
     @Test
     public void addUser_tooLongAuthorizableCall_exceptionThrown()
             throws AuthorizableGatewayException {
         // given
-        doAnswer(longAnswer()).when(authorizableMock1).addUser(USER_ID, USER_NAME);
+        doAnswer(longAnswer()).when(authorizableMock1).addUser(USER_ID);
 
         // when
         Engine engine = new Engine(listOfAuthorizables, ENGINE_TIMEOUT_IN_SECONDS);
@@ -86,7 +84,7 @@ public class EngineTest {
         thrown.expect(AuthorizableGatewayException.class);
         thrown.expectMessage("Error adding user");
         thrown.expectMessage("TimeoutException");
-        engine.addUser(USER_ID, USER_NAME);
+        engine.addUser(USER_ID);
     }
     
     @Test
@@ -94,7 +92,7 @@ public class EngineTest {
             throws AuthorizableGatewayException {
         // given
         doThrow(new AuthorizableGatewayException(EXCEPTION_MESSAGE)).when(authorizableMock1)
-                .addUser(USER_ID, USER_NAME);
+                .addUser(USER_ID);
 
         // when
         Engine engine = new Engine(listOfAuthorizables, ENGINE_TIMEOUT_IN_SECONDS);
@@ -103,7 +101,7 @@ public class EngineTest {
         thrown.expect(AuthorizableGatewayException.class);
         thrown.expectMessage("Error adding user");
         thrown.expectMessage(AUTHORIZABLE1_NAME + " failed: " + EXCEPTION_MESSAGE);
-        engine.addUser(USER_ID, USER_NAME);
+        engine.addUser(USER_ID);
 
     }
    
@@ -113,18 +111,18 @@ public class EngineTest {
         Engine engine = new Engine(listOfAuthorizables, ENGINE_TIMEOUT_IN_SECONDS);
 
         // when
-        engine.addOrganization(ORG_ID, ORG_NAME);
+        engine.addOrganization(ORG_ID);
 
         // then
-        verify(authorizableMock1).addOrganization(ORG_ID, ORG_NAME);
-        verify(authorizableMock2).addOrganization(ORG_ID, ORG_NAME);
+        verify(authorizableMock1).addOrganization(ORG_ID);
+        verify(authorizableMock2).addOrganization(ORG_ID);
     }
 
     @Test
     public void addOrganization_tooLongAuthorizableCall_exceptionThrown()
             throws AuthorizableGatewayException {
         // given
-        doAnswer(longAnswer()).when(authorizableMock1).addOrganization(ORG_ID, ORG_NAME);
+        doAnswer(longAnswer()).when(authorizableMock1).addOrganization(ORG_ID);
 
         // when
         Engine engine = new Engine(listOfAuthorizables, ENGINE_TIMEOUT_IN_SECONDS);
@@ -133,7 +131,7 @@ public class EngineTest {
         thrown.expect(AuthorizableGatewayException.class);
         thrown.expectMessage("Error adding organization");
         thrown.expectMessage("TimeoutException");
-        engine.addOrganization(ORG_ID, ORG_NAME);
+        engine.addOrganization(ORG_ID);
     }
 
     @Test
@@ -141,7 +139,7 @@ public class EngineTest {
             throws AuthorizableGatewayException {
         // given
         doThrow(new AuthorizableGatewayException(EXCEPTION_MESSAGE)).when(authorizableMock1)
-                .addOrganization(ORG_ID, ORG_NAME);
+                .addOrganization(ORG_ID);
 
         // when
         Engine engine = new Engine(listOfAuthorizables, ENGINE_TIMEOUT_IN_SECONDS);
@@ -150,7 +148,7 @@ public class EngineTest {
         thrown.expect(AuthorizableGatewayException.class);
         thrown.expectMessage("Error adding organization");
         thrown.expectMessage(AUTHORIZABLE1_NAME + " failed: " + EXCEPTION_MESSAGE);
-        engine.addOrganization(ORG_ID, ORG_NAME);
+        engine.addOrganization(ORG_ID);
 
     }
     
@@ -207,18 +205,18 @@ public class EngineTest {
         Engine engine = new Engine(listOfAuthorizables, ENGINE_TIMEOUT_IN_SECONDS);
 
         // when
-        engine.removeUser(USER_ID, USER_NAME);
+        engine.removeUser(USER_ID);
 
         // then
-        verify(authorizableMock1).removeUser(USER_ID, USER_NAME);
-        verify(authorizableMock2).removeUser(USER_ID, USER_NAME);
+        verify(authorizableMock1).removeUser(USER_ID);
+        verify(authorizableMock2).removeUser(USER_ID);
     }
 
     @Test
     public void removeUser_tooLongAuthorizableCall_exceptionThrown()
             throws AuthorizableGatewayException {
         // given
-        doAnswer(longAnswer()).when(authorizableMock1).removeUser(USER_ID, USER_NAME);
+        doAnswer(longAnswer()).when(authorizableMock1).removeUser(USER_ID);
 
         // when
         Engine engine = new Engine(listOfAuthorizables, ENGINE_TIMEOUT_IN_SECONDS);
@@ -227,7 +225,7 @@ public class EngineTest {
         thrown.expect(AuthorizableGatewayException.class);
         thrown.expectMessage("Error removing user");
         thrown.expectMessage("TimeoutException");
-        engine.removeUser(USER_ID, USER_NAME);
+        engine.removeUser(USER_ID);
     }
 
     @Test
@@ -235,7 +233,7 @@ public class EngineTest {
             throws AuthorizableGatewayException {
         // given
         doThrow(new AuthorizableGatewayException(EXCEPTION_MESSAGE)).when(authorizableMock1)
-                .removeUser(USER_ID, USER_NAME);
+                .removeUser(USER_ID);
 
         // when
         Engine engine = new Engine(listOfAuthorizables, ENGINE_TIMEOUT_IN_SECONDS);
@@ -244,7 +242,7 @@ public class EngineTest {
         thrown.expect(AuthorizableGatewayException.class);
         thrown.expectMessage("Error removing user");
         thrown.expectMessage(AUTHORIZABLE1_NAME + " failed: " + EXCEPTION_MESSAGE);
-        engine.removeUser(USER_ID, USER_NAME);
+        engine.removeUser(USER_ID);
 
     }
     
@@ -254,18 +252,18 @@ public class EngineTest {
         Engine engine = new Engine(listOfAuthorizables, ENGINE_TIMEOUT_IN_SECONDS);
 
         // when
-        engine.removeOrganization(ORG_ID, ORG_NAME);
+        engine.removeOrganization(ORG_ID);
 
         // then
-        verify(authorizableMock1).removeOrganization(ORG_ID, ORG_NAME);
-        verify(authorizableMock2).removeOrganization(ORG_ID, ORG_NAME);
+        verify(authorizableMock1).removeOrganization(ORG_ID);
+        verify(authorizableMock2).removeOrganization(ORG_ID);
     }
 
     @Test
     public void removeOrganization_tooLongAuthorizableCall_exceptionThrown()
             throws AuthorizableGatewayException {
         // given
-        doAnswer(longAnswer()).when(authorizableMock1).removeOrganization(ORG_ID, ORG_NAME);
+        doAnswer(longAnswer()).when(authorizableMock1).removeOrganization(ORG_ID);
 
         // when
         Engine engine = new Engine(listOfAuthorizables, ENGINE_TIMEOUT_IN_SECONDS);
@@ -274,7 +272,7 @@ public class EngineTest {
         thrown.expect(AuthorizableGatewayException.class);
         thrown.expectMessage("Error removing organization");
         thrown.expectMessage("TimeoutException");
-        engine.removeOrganization(ORG_ID, ORG_NAME);
+        engine.removeOrganization(ORG_ID);
     }
 
     @Test
@@ -282,7 +280,7 @@ public class EngineTest {
             throws AuthorizableGatewayException {
         // given
         doThrow(new AuthorizableGatewayException(EXCEPTION_MESSAGE)).when(authorizableMock1)
-                .removeOrganization(ORG_ID, ORG_NAME);
+                .removeOrganization(ORG_ID);
 
         // when
         Engine engine = new Engine(listOfAuthorizables, ENGINE_TIMEOUT_IN_SECONDS);
@@ -291,7 +289,7 @@ public class EngineTest {
         thrown.expect(AuthorizableGatewayException.class);
         thrown.expectMessage("Error removing organization");
         thrown.expectMessage(AUTHORIZABLE1_NAME + " failed: " + EXCEPTION_MESSAGE);
-        engine.removeOrganization(ORG_ID, ORG_NAME);
+        engine.removeOrganization(ORG_ID);
 
     }
     

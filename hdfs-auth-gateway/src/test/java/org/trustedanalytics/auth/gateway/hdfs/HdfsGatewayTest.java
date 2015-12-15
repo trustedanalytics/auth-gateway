@@ -80,7 +80,7 @@ public class HdfsGatewayTest {
   @Test
   public void addOrganization_createDirectoryCalled_creationSuccess()
       throws AuthorizableGatewayException, IOException {
-    hdfsGateway.addOrganization(ORG, ORG);
+    hdfsGateway.addOrganization(ORG);
     verify(hdfsClient).createDirectory(ORG_PATH, "test_org_admin", "test_org", userPermission);
     verify(hdfsClient).createDirectory(BROKER_PATH, "test_org_admin", "test_org", userPermission);
     verify(hdfsClient)
@@ -95,13 +95,13 @@ public class HdfsGatewayTest {
       throws AuthorizableGatewayException, IOException {
     doThrow(new IOException()).when(hdfsClient).createDirectory(ORG_PATH, "test_org_admin",
         "test_org", userPermission);
-    hdfsGateway.addOrganization(ORG, ORG);
+    hdfsGateway.addOrganization(ORG);
   }
 
   @Test
   public void removeOrganization_deleteDirectoryCalled_deleteDirectoryMethodCalled()
       throws AuthorizableGatewayException, IOException {
-    hdfsGateway.removeOrganization(ORG, ORG);
+    hdfsGateway.removeOrganization(ORG);
     verify(hdfsClient).deleteDirectory(pathCreator.createOrgPath("test_org"));
   }
 
@@ -109,7 +109,7 @@ public class HdfsGatewayTest {
   public void removeOrganization_hdfsClientThrowIOException_throwAuthorizableGatewayException()
       throws AuthorizableGatewayException, IOException {
     doThrow(new IOException()).when(hdfsClient).deleteDirectory(ORG_PATH);
-    hdfsGateway.removeOrganization(ORG, ORG);
+    hdfsGateway.removeOrganization(ORG);
   }
 
   @Test

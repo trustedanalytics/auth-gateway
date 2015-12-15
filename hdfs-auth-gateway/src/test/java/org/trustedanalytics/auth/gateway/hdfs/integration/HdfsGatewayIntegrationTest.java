@@ -79,7 +79,7 @@ public class HdfsGatewayIntegrationTest {
   @Test
   public void createOrg_createDirectories_directoryExistWithPermissionsAndOwner()
       throws IOException, AuthorizableGatewayException {
-    hdfsGateway.addOrganization("intel", "org_name");
+    hdfsGateway.addOrganization("intel");
 
     checkIfDirectoryExistsWithPermissions(TEST_ORG_PATH, "intel_admin", aclUserPermission);
     checkIfDirectoryExistsWithPermissions(TEST_ORG_USERS_PATH, "intel_admin", userPermission);
@@ -92,15 +92,15 @@ public class HdfsGatewayIntegrationTest {
   @Test
   public void createSecondOrgWithSameName_directoryAlreadyExists_doNothing() throws IOException,
       AuthorizableGatewayException {
-    hdfsGateway.addOrganization("intel", "org_name");
-    hdfsGateway.addOrganization("intel", "org_name");
+    hdfsGateway.addOrganization("intel");
+    hdfsGateway.addOrganization("intel");
     checkIfDirectoryExistsWithPermissions(TEST_ORG_PATH, "intel_admin", aclUserPermission);
   }
 
   @Test
   public void createOrgWithUsers_directoryExistWithPermissionsAndOwner_createDirectories()
       throws IOException, AuthorizableGatewayException {
-    hdfsGateway.addOrganization("intel", "org_name");
+    hdfsGateway.addOrganization("intel");
     checkIfDirectoryExistsWithPermissions(TEST_ORG_PATH, "intel_admin", aclUserPermission);
     hdfsGateway.addUserToOrg("test_user", "intel");
     checkIfDirectoryExistsWithPermissions(TEST_USER_PATH, "test_user", userPermission);
@@ -109,7 +109,7 @@ public class HdfsGatewayIntegrationTest {
   @Test
   public void createSecondUserWithSameName_createDirectories_doNothing() throws IOException,
       AuthorizableGatewayException {
-    hdfsGateway.addOrganization("intel", "org_name");
+    hdfsGateway.addOrganization("intel");
     checkIfDirectoryExistsWithPermissions(TEST_ORG_PATH, "intel_admin", aclUserPermission);
     hdfsGateway.addUserToOrg("test_user", "intel");
     hdfsGateway.addUserToOrg("test_user", "intel");
@@ -119,22 +119,22 @@ public class HdfsGatewayIntegrationTest {
   @Test
   public void deleteEmptyOrg_subDirectoriesNotExists_deleteDirectory() throws IOException,
       AuthorizableGatewayException {
-    hdfsGateway.addOrganization("intel", "org_name");
+    hdfsGateway.addOrganization("intel");
     checkIfDirectoryExistsWithPermissions(TEST_ORG_PATH, "intel_admin", aclUserPermission);
 
-    hdfsGateway.removeOrganization("intel", "org_name");
+    hdfsGateway.removeOrganization("intel");
     assertThat(fileSystem.exists(TEST_ORG_PATH), equalTo(false));
   }
 
   @Test
   public void deleteOrgWithUsers_subDirectoriesExists_deleteDirectoryWithSubDirectories()
       throws IOException, AuthorizableGatewayException {
-    hdfsGateway.addOrganization("intel", "org_name");
+    hdfsGateway.addOrganization("intel");
     checkIfDirectoryExistsWithPermissions(TEST_ORG_PATH, "intel_admin", aclUserPermission);
     hdfsGateway.addUserToOrg("test_user", "intel");
     checkIfDirectoryExistsWithPermissions(TEST_USER_PATH, "test_user", userPermission);
 
-    hdfsGateway.removeOrganization("intel", "org_name");
+    hdfsGateway.removeOrganization("intel");
 
     assertThat(fileSystem.exists(TEST_ORG_PATH), equalTo(false));
     assertThat(fileSystem.exists(TEST_USER_PATH), equalTo(false));
@@ -143,7 +143,7 @@ public class HdfsGatewayIntegrationTest {
   @Test
   public void deleteNotExistingOrg_directoryNotExists_doNothing() throws IOException,
       AuthorizableGatewayException {
-    hdfsGateway.removeOrganization("intel", "org_name");
+    hdfsGateway.removeOrganization("intel");
     assertThat(fileSystem.exists(TEST_ORG_PATH), equalTo(false));
   }
 

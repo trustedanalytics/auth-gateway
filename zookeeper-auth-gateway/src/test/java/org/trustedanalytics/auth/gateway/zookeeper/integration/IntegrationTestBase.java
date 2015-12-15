@@ -1,17 +1,15 @@
 /**
  * Copyright (c) 2015 Intel Corporation
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package org.trustedanalytics.auth.gateway.zookeeper.integration;
@@ -44,251 +42,227 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public abstract class IntegrationTestBase {
 
-    @Mock
-    private KerberosClient krbClient;
+  @Mock
+  private KerberosClient krbClient;
 
-    @Mock
-    private ZookeeperAuthorizationEnv env;
+  @Mock
+  private ZookeeperAuthorizationEnv env;
 
-    private String rootNode;
-    private ZookeeperTestOperations zkTestOperations;
-    private Authorizable sut;
+  private String rootNode;
+  private ZookeeperTestOperations zkTestOperations;
+  private Authorizable sut;
 
-    @Rule
-    public TestName testName = new TestName();
+  @Rule
+  public TestName testName = new TestName();
 
-    @Before
-    public void setUp() throws Exception {
-        //different zookeeper root node for each test - to avoid test server restart between tests
-        rootNode = "/" + getClass().getSimpleName() + "_" + testName.getMethodName();
-        zkTestOperations = getZkTestOperations();
-        zkTestOperations.createNode(rootNode);
+  @Before
+  public void setUp() throws Exception {
+    // different zookeeper root node for each test - to avoid test server restart between tests
+    rootNode = "/" + getClass().getSimpleName() + "_" + testName.getMethodName();
+    zkTestOperations = getZkTestOperations();
+    zkTestOperations.createNode(rootNode);
 
-        //mocked environment
-        KerberosProperties krbProperties = getKrbProperties();
-        when(env.zookeeperRootNode()).thenReturn(rootNode);
-        when(env.kerberosProperties()).thenReturn(krbProperties);
-        when(env.zookeeperQuorum()).thenReturn(getZkTestServerConnectionString());
-        when(krbClient.login(krbProperties)).thenReturn(krbProperties.isValid());
+    // mocked environment
+    KerberosProperties krbProperties = getKrbProperties();
+    when(env.zookeeperRootNode()).thenReturn(rootNode);
+    when(env.kerberosProperties()).thenReturn(krbProperties);
+    when(env.zookeeperQuorum()).thenReturn(getZkTestServerConnectionString());
+    when(krbClient.login(krbProperties)).thenReturn(krbProperties.isValid());
 
-        sut = ZookeeperGatewayFactory
-            .newInstance(env, krbClient, getCustomCuratorBuilderSteps())
-            .create();
-    }
+    sut = ZookeeperGatewayFactory.newInstance(env, krbClient, getCustomCuratorBuilderSteps())
+        .create();
+  }
 
-    protected abstract ZookeeperTestOperations getZkTestOperations();
+  protected abstract ZookeeperTestOperations getZkTestOperations();
 
-    protected abstract String getZkTestServerConnectionString();
+  protected abstract String getZkTestServerConnectionString();
 
-    protected abstract Function<CuratorFrameworkFactory.Builder, CuratorFrameworkFactory.Builder> getCustomCuratorBuilderSteps();
+  protected abstract Function<CuratorFrameworkFactory.Builder, CuratorFrameworkFactory.Builder> getCustomCuratorBuilderSteps();
 
-    protected abstract KerberosProperties getKrbProperties();
+  protected abstract KerberosProperties getKrbProperties();
 
-    @After
-    public void tearDown() throws Exception {
-        zkTestOperations.close();
-    }
+  @After
+  public void tearDown() throws Exception {
+    zkTestOperations.close();
+  }
 
-    @Test
-    public void addOrg_krbAndZookeeperWorks_krbCalledAndZnodeCreatedWithAcl()
-        throws Exception {
+  @Test
+  public void addOrg_krbAndZookeeperWorks_krbCalledAndZnodeCreatedWithAcl() throws Exception {
 
-        //arrange
-        String orgId = "8de9c508-3d56-4dd8-ad99-5a22fe91333f";
-        String orgName = "org1";
+    // arrange
+    String orgId = "8de9c508-3d56-4dd8-ad99-5a22fe91333f";
 
-        //act
-        sut.addOrganization(orgId, orgName);
+    // act
+    sut.addOrganization(orgId);
 
-        //assert
-        zkTestOperations.assertNodeExists(rootNode + "/" + orgId,
-            withAcl(ZookeeperPermission.CRDWA, getKrbProperties().getUser()));
-    }
+    // assert
+    zkTestOperations.assertNodeExists(rootNode + "/" + orgId,
+        withAcl(ZookeeperPermission.CRDWA, getKrbProperties().getUser()));
+  }
 
-    @Test
-    public void idempotence_addOrgManyTimes_shouldAddOnceAndTerminateWithoutErrors()
-        throws Exception {
+  @Test
+  public void idempotence_addOrgManyTimes_shouldAddOnceAndTerminateWithoutErrors()
+      throws Exception {
 
-        //arrange
-        String orgId = "8de9c508-3d56-4dd8-ad99-5a22fe91333f";
-        String orgName = "org1_i";
+    // arrange
+    String orgId = "8de9c508-3d56-4dd8-ad99-5a22fe91333f";
 
-        //act
-        sut.addOrganization(orgId, orgName);
-        sut.addOrganization(orgId, orgName);
-        sut.addOrganization(orgId, orgName);
+    // act
+    sut.addOrganization(orgId);
+    sut.addOrganization(orgId);
+    sut.addOrganization(orgId);
 
-        //assert
-        zkTestOperations.assertNodeExists(rootNode + "/" + orgId,
-            withAcl(ZookeeperPermission.CRDWA, getKrbProperties().getUser()));
-    }
+    // assert
+    zkTestOperations.assertNodeExists(rootNode + "/" + orgId,
+        withAcl(ZookeeperPermission.CRDWA, getKrbProperties().getUser()));
+  }
 
-    @Test
-    public void addOrgAddOneUserToOrg_krbAndZookeeperWorks_krbCalledAndZnodeCreatedWithAcls()
-        throws Exception {
+  @Test
+  public void addOrgAddOneUserToOrg_krbAndZookeeperWorks_krbCalledAndZnodeCreatedWithAcls()
+      throws Exception {
 
-        //arrange
-        String userId = "user1";
-        String orgId = "a844d33e-0ec2-401e-8a53-88131b92d3d7";
-        String orgName = "org2";
-        sut.addOrganization(orgId, orgName);
+    // arrange
+    String userId = "user1";
+    String orgId = "a844d33e-0ec2-401e-8a53-88131b92d3d7";
+    sut.addOrganization(orgId);
 
-        //act
-        sut.addUserToOrg(userId, orgId);
+    // act
+    sut.addUserToOrg(userId, orgId);
 
-        //assert
-        zkTestOperations.assertNodeExists(rootNode + "/" + orgId,
-            withAcls(
-                ZookeeperPermission.CRDWA, getKrbProperties().getUser(),
-                ZookeeperPermission.CRDW, userId));
-    }
+    // assert
+    zkTestOperations.assertNodeExists(rootNode + "/" + orgId, withAcls(ZookeeperPermission.CRDWA,
+        getKrbProperties().getUser(), ZookeeperPermission.CRDW, userId));
+  }
 
-    @Test
-    public void idempotence_addOrgAndOneUserToOrgManyTimes_shouldAddOrgAndUserOnceAndTerminateWithoutErrors()
-        throws Exception {
+  @Test
+  public void idempotence_addOrgAndOneUserToOrgManyTimes_shouldAddOrgAndUserOnceAndTerminateWithoutErrors()
+      throws Exception {
 
-        //arrange
-        String userId = "user1";
-        String orgId = "a844d33e-0ec2-401e-8a53-88131b92d3d7";
-        String orgName = "org2_i";
-        sut.addOrganization(orgId, orgName);
+    // arrange
+    String userId = "user1";
+    String orgId = "a844d33e-0ec2-401e-8a53-88131b92d3d7";
+    sut.addOrganization(orgId);
 
-        //act
-        sut.addUserToOrg(userId, orgId);
-        sut.addUserToOrg(userId, orgId);
-        sut.addUserToOrg(userId, orgId);
+    // act
+    sut.addUserToOrg(userId, orgId);
+    sut.addUserToOrg(userId, orgId);
+    sut.addUserToOrg(userId, orgId);
 
-        //assert
-        zkTestOperations.assertNodeExists(rootNode + "/" + orgId,
-            withAcls(
-                ZookeeperPermission.CRDWA, getKrbProperties().getUser(),
-                ZookeeperPermission.CRDW, userId));
-    }
+    // assert
+    zkTestOperations.assertNodeExists(rootNode + "/" + orgId, withAcls(ZookeeperPermission.CRDWA,
+        getKrbProperties().getUser(), ZookeeperPermission.CRDW, userId));
+  }
 
-    @Test
-    public void addOrgAddManyUsersToOrg_krbAndZookeeperWorks_krbCalledAndZnodeCreatedWithAcls()
-        throws Exception {
+  @Test
+  public void addOrgAddManyUsersToOrg_krbAndZookeeperWorks_krbCalledAndZnodeCreatedWithAcls()
+      throws Exception {
 
-        //arrange
-        String userId1 = "user1";
-        String userId2 = "user2";
-        String orgId = "a8d743e3-0ca5-419a-a0f2-668adbe53d80";
-        String orgName = "org3";
-        sut.addOrganization(orgId, orgName);
+    // arrange
+    String userId1 = "user1";
+    String userId2 = "user2";
+    String orgId = "a8d743e3-0ca5-419a-a0f2-668adbe53d80";
+    sut.addOrganization(orgId);
 
-        //act
-        sut.addUserToOrg(userId1, orgId);
-        sut.addUserToOrg(userId2, orgId);
+    // act
+    sut.addUserToOrg(userId1, orgId);
+    sut.addUserToOrg(userId2, orgId);
 
-        //assert
-        zkTestOperations.assertNodeExists(rootNode + "/" + orgId,
-            withAcls(
-                ZookeeperPermission.CRDWA, getKrbProperties().getUser(),
-                ZookeeperPermission.CRDW, userId1,
-                ZookeeperPermission.CRDW, userId2));
-    }
+    // assert
+    zkTestOperations.assertNodeExists(rootNode + "/" + orgId,
+        withAcls(ZookeeperPermission.CRDWA, getKrbProperties().getUser(), ZookeeperPermission.CRDW,
+            userId1, ZookeeperPermission.CRDW, userId2));
+  }
 
-    @Test
-    public void addOrgAddManyUsersToOrgAndDeleteOneOfThem_krbAndZookeeperWorks_krbCalledAndZnodeCreatedWithAcls()
-        throws Exception {
+  @Test
+  public void addOrgAddManyUsersToOrgAndDeleteOneOfThem_krbAndZookeeperWorks_krbCalledAndZnodeCreatedWithAcls()
+      throws Exception {
 
-        //arrange
-        String userId1 = "user1";
-        String userId2 = "user2";
-        String orgId = "b3ccab31-57ed-4831-ad1f-cf1d7389da26";
-        String orgName = "org4";
-        sut.addOrganization(orgId, orgName);
-        sut.addUserToOrg(userId1, orgId);
-        sut.addUserToOrg(userId2, orgId);
+    // arrange
+    String userId1 = "user1";
+    String userId2 = "user2";
+    String orgId = "b3ccab31-57ed-4831-ad1f-cf1d7389da26";
+    sut.addOrganization(orgId);
+    sut.addUserToOrg(userId1, orgId);
+    sut.addUserToOrg(userId2, orgId);
 
-        //act
-        sut.removeUserFromOrg(userId1, orgId);
+    // act
+    sut.removeUserFromOrg(userId1, orgId);
 
-        //assert
-        zkTestOperations.assertNodeExists(rootNode + "/" + orgId,
-            withAcls(
-                ZookeeperPermission.CRDWA, getKrbProperties().getUser(),
-                ZookeeperPermission.CRDW, userId2));
-    }
+    // assert
+    zkTestOperations.assertNodeExists(rootNode + "/" + orgId, withAcls(ZookeeperPermission.CRDWA,
+        getKrbProperties().getUser(), ZookeeperPermission.CRDW, userId2));
+  }
 
-    @Test
-    public void idempotence_addOrgAndOneUserToOrgAndDeleteUserManyTimes_shouldCreateNodeWithCorrectAclsAndTerminateWithoutErrors()
-        throws Exception {
+  @Test
+  public void idempotence_addOrgAndOneUserToOrgAndDeleteUserManyTimes_shouldCreateNodeWithCorrectAclsAndTerminateWithoutErrors()
+      throws Exception {
 
-        //arrange
-        String userId1 = "user1";
-        String userId2 = "user2";
-        String orgId = "b3ccab31-57ed-4831-ad1f-cf1d7389da26";
-        String orgName = "org4_i";
-        sut.addOrganization(orgId, orgName);
-        sut.addUserToOrg(userId1, orgId);
-        sut.addUserToOrg(userId2, orgId);
+    // arrange
+    String userId1 = "user1";
+    String userId2 = "user2";
+    String orgId = "b3ccab31-57ed-4831-ad1f-cf1d7389da26";
+    sut.addOrganization(orgId);
+    sut.addUserToOrg(userId1, orgId);
+    sut.addUserToOrg(userId2, orgId);
 
-        //act
-        sut.removeUserFromOrg(userId1, orgId);
-        sut.removeUserFromOrg(userId1, orgId);
-        sut.removeUserFromOrg(userId1, orgId);
+    // act
+    sut.removeUserFromOrg(userId1, orgId);
+    sut.removeUserFromOrg(userId1, orgId);
+    sut.removeUserFromOrg(userId1, orgId);
 
-        //assert
-        zkTestOperations.assertNodeExists(rootNode + "/" + orgId,
-            withAcls(
-                ZookeeperPermission.CRDWA, getKrbProperties().getUser(),
-                ZookeeperPermission.CRDW, userId2));
-    }
+    // assert
+    zkTestOperations.assertNodeExists(rootNode + "/" + orgId, withAcls(ZookeeperPermission.CRDWA,
+        getKrbProperties().getUser(), ZookeeperPermission.CRDW, userId2));
+  }
 
-    @Test
-    public void addOrgRemoveOrg_krbAndZookeeperWorks_krbCalledAndZnodeNotExist()
-        throws Exception {
+  @Test
+  public void addOrgRemoveOrg_krbAndZookeeperWorks_krbCalledAndZnodeNotExist() throws Exception {
 
-        //arrange
-        String orgId = "60329ebc-345d-4a03-abe1-5a50f1de182e";
-        String orgName = "org5";
-        sut.addOrganization(orgId, orgName);
+    // arrange
+    String orgId = "60329ebc-345d-4a03-abe1-5a50f1de182e";
+    sut.addOrganization(orgId);
 
-        //act
-        sut.removeOrganization(orgId, orgName);
+    // act
+    sut.removeOrganization(orgId);
 
-        //assert
-        zkTestOperations.assertNodeNotExist(rootNode + "/" + orgId);
-    }
+    // assert
+    zkTestOperations.assertNodeNotExist(rootNode + "/" + orgId);
+  }
 
-    @Test
-    public void idempotence_addOrgAndRemoveOrgManyTimes_shouldDeleteNodeAndTerminateWithoutErrors()
-        throws Exception {
+  @Test
+  public void idempotence_addOrgAndRemoveOrgManyTimes_shouldDeleteNodeAndTerminateWithoutErrors()
+      throws Exception {
 
-        //arrange
-        String orgId = "60329ebc-345d-4a03-abe1-5a50f1de182e";
-        String orgName = "org5";
-        sut.addOrganization(orgId, orgName);
+    // arrange
+    String orgId = "60329ebc-345d-4a03-abe1-5a50f1de182e";
+    sut.addOrganization(orgId);
 
-        //act
-        sut.removeOrganization(orgId, orgName);
-        sut.removeOrganization(orgId, orgName);
-        sut.removeOrganization(orgId, orgName);
+    // act
+    sut.removeOrganization(orgId);
+    sut.removeOrganization(orgId);
+    sut.removeOrganization(orgId);
 
-        //assert
-        zkTestOperations.assertNodeNotExist(rootNode + "/" + orgId);
-    }
+    // assert
+    zkTestOperations.assertNodeNotExist(rootNode + "/" + orgId);
+  }
 
-    private List<ACL> withAcl(ZookeeperPermission permissions, String user) {
-        return Arrays.asList(new ACL(permissions.getPerms(), new Id("sasl", user)));
-    }
+  private List<ACL> withAcl(ZookeeperPermission permissions, String user) {
+    return Arrays.asList(new ACL(permissions.getPerms(), new Id("sasl", user)));
+  }
 
-    private List<ACL> withAcls(ZookeeperPermission permissionsUser1, String user1,
-        ZookeeperPermission permissionsUser2, String user2) {
+  private List<ACL> withAcls(ZookeeperPermission permissionsUser1, String user1,
+      ZookeeperPermission permissionsUser2, String user2) {
 
-        return Arrays.asList(
-            new ACL(permissionsUser1.getPerms(), new Id("sasl", user1)),
-            new ACL(permissionsUser2.getPerms(), new Id("sasl", user2)));
-    }
+    return Arrays.asList(new ACL(permissionsUser1.getPerms(), new Id("sasl", user1)),
+        new ACL(permissionsUser2.getPerms(), new Id("sasl", user2)));
+  }
 
-    private List<ACL> withAcls(ZookeeperPermission permissionsUser1, String user1,
-        ZookeeperPermission permissionsUser2, String user2,
-        ZookeeperPermission permissionsUser3, String user3) {
+  private List<ACL> withAcls(ZookeeperPermission permissionsUser1, String user1,
+      ZookeeperPermission permissionsUser2, String user2, ZookeeperPermission permissionsUser3,
+      String user3) {
 
-        return Arrays.asList(
-            new ACL(permissionsUser1.getPerms(), new Id("sasl", user1)),
-            new ACL(permissionsUser2.getPerms(), new Id("sasl", user2)),
-            new ACL(permissionsUser3.getPerms(), new Id("sasl", user3)));
-    }
+    return Arrays.asList(new ACL(permissionsUser1.getPerms(), new Id("sasl", user1)),
+        new ACL(permissionsUser2.getPerms(), new Id("sasl", user2)),
+        new ACL(permissionsUser3.getPerms(), new Id("sasl", user3)));
+  }
 }

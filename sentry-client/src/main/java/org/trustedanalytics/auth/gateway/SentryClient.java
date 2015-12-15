@@ -31,13 +31,13 @@ public class SentryClient implements Authorizable {
   private CustomSentryPolicyServiceClient delegate;
 
   @Override
-  public void addOrganization(String orgId, String orgName) throws AuthorizableGatewayException {
-      delegate.createRole(orgName);
-      delegate.grantRoleToGroup(orgName, orgName);
+  public void addOrganization(String orgId) throws AuthorizableGatewayException {
+      delegate.createRole(orgId);
+      delegate.grantRoleToGroup(orgId, orgId);
   }
 
   @Override
-  public void addUser(String userId, String userName) throws AuthorizableGatewayException {
+  public void addUser(String userId) throws AuthorizableGatewayException {
   }
 
   @Override
@@ -45,12 +45,12 @@ public class SentryClient implements Authorizable {
   }
 
   @Override
-  public void removeOrganization(String orgId, String orgName) throws AuthorizableGatewayException {
-      delegate.dropRoleIfExists(orgName);
+  public void removeOrganization(String orgId) throws AuthorizableGatewayException {
+      delegate.dropRoleIfExists(orgId);
   }
 
   @Override
-  public void removeUser(String userId, String userName) throws AuthorizableGatewayException {
+  public void removeUser(String userId) throws AuthorizableGatewayException {
   }
 
   @Override

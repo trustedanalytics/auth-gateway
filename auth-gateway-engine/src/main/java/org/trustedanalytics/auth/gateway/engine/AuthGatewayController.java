@@ -17,9 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.trustedanalytics.auth.gateway.engine.Engine;
 import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
 
 @RestController
@@ -33,15 +31,15 @@ class AuthGatewayController {
     }
 
     @RequestMapping(value = "/users/{userId}", method = RequestMethod.PUT)
-    public void addUser(@PathVariable String userId, @RequestParam String userName)
+    public void addUser(@PathVariable String userId)
             throws AuthorizableGatewayException {
-        authGatewayEngine.addUser(userId, userName);
+        authGatewayEngine.addUser(userId);
     }
 
     @RequestMapping(value = "/organizations/{orgId}", method = RequestMethod.PUT)
-    public void addOrganization(@PathVariable String orgId, @RequestParam String orgName)
+    public void addOrganization(@PathVariable String orgId)
             throws AuthorizableGatewayException {
-        authGatewayEngine.addOrganization(orgId, orgName);
+        authGatewayEngine.addOrganization(orgId);
     }
 
     @RequestMapping(value = "/organizations/{orgId}/users/{userId}", method = RequestMethod.PUT)
@@ -51,15 +49,15 @@ class AuthGatewayController {
     }
 
     @RequestMapping(value = "/users/{userId}", method = RequestMethod.DELETE)
-    public void deleteUser(@PathVariable String userId, @RequestParam String userName)
+    public void deleteUser(@PathVariable String userId)
             throws AuthorizableGatewayException {
-        authGatewayEngine.removeUser(userId, userName);
+        authGatewayEngine.removeUser(userId);
     }
 
     @RequestMapping(value = "/organizations/{orgId}", method = RequestMethod.DELETE)
-    public void deleteOrganization(@PathVariable String orgId, @RequestParam String orgName)
+    public void deleteOrganization(@PathVariable String orgId)
             throws AuthorizableGatewayException {
-        authGatewayEngine.removeOrganization(orgId, orgName);
+        authGatewayEngine.removeOrganization(orgId);
     }
 
     @RequestMapping(value = "/organizations/{orgId}/users/{userId}", method = RequestMethod.DELETE)

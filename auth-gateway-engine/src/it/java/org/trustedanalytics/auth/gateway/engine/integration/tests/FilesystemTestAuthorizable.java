@@ -26,102 +26,101 @@ import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
  */
 public class FilesystemTestAuthorizable implements Authorizable {
 
-    private static final String SYSTEM_TEMP = System.getProperty("java.io.tmpdir");
+  private static final String SYSTEM_TEMP = System.getProperty("java.io.tmpdir");
 
-    /**
-     * Creates subdirectory in system tmp dir.
-     */
-    @Override
-    public void addOrganization(String orgId, String orgName) throws AuthorizableGatewayException {
+  /**
+   * Creates subdirectory in system tmp dir.
+   */
+  @Override
+  public void addOrganization(String orgId) throws AuthorizableGatewayException {
 
-        Path dir = FileSystems.getDefault().getPath(SYSTEM_TEMP, orgId);
-        if (Files.exists(dir) && Files.isDirectory(dir)) {
-            return;
-        }
-        try {
-            Files.createDirectory(dir);
-        } catch (IOException e) {
-            throw new AuthorizableGatewayException(
-                    "Unable to create org directory " + dir.toAbsolutePath(), e);
-        }
+    Path dir = FileSystems.getDefault().getPath(SYSTEM_TEMP, orgId);
+    if (Files.exists(dir) && Files.isDirectory(dir)) {
+      return;
+    }
+    try {
+      Files.createDirectory(dir);
+    } catch (IOException e) {
+      throw new AuthorizableGatewayException(
+          "Unable to create org directory " + dir.toAbsolutePath(), e);
+    }
+  }
+
+  @Override
+  public void addUser(String userId) throws AuthorizableGatewayException {
+
+    Path file = FileSystems.getDefault().getPath(SYSTEM_TEMP, userId);
+    try {
+      Files.createFile(file);
+    } catch (IOException e) {
+      throw new AuthorizableGatewayException("Unable to create user file " + file.toAbsolutePath(),
+          e);
+    }
+  }
+
+  @Override
+  public void addUserToOrg(String userId, String orgId) throws AuthorizableGatewayException {
+    Path orgDir = FileSystems.getDefault().getPath(SYSTEM_TEMP, orgId);
+    Path file = FileSystems.getDefault().getPath(SYSTEM_TEMP, orgId, userId);
+
+    if (!Files.exists(orgDir)) {
+      try {
+        Files.createDirectory(orgDir);
+      } catch (IOException e) {
+        throw new AuthorizableGatewayException(
+            "Unable to create org directory " + file.toAbsolutePath(), e);
+      }
     }
 
-    @Override
-    public void addUser(String userId, String userName) throws AuthorizableGatewayException {
+    try {
+      Files.createFile(file);
+    } catch (IOException e) {
+      throw new AuthorizableGatewayException("Unable to create user file " + file.toAbsolutePath(),
+          e);
+    }
+  }
 
-        Path file = FileSystems.getDefault().getPath(SYSTEM_TEMP, userId);
-        try {
-            Files.createFile(file);
-        } catch (IOException e) {
-            throw new AuthorizableGatewayException(
-                    "Unable to create user file " + file.toAbsolutePath(), e);
-        }
+  @Override
+  public void removeOrganization(String orgId) throws AuthorizableGatewayException {
+    Path dir = FileSystems.getDefault().getPath(SYSTEM_TEMP, orgId);
+    try {
+      DirectoryDeleter.deleteDirectoryRecursively(dir);
+    } catch (IOException e) {
+      throw new AuthorizableGatewayException("Unable to delete directory " + dir.toAbsolutePath(),
+          e);
+    }
+  }
+
+  @Override
+  public void removeUser(String userId) throws AuthorizableGatewayException {
+    Path file = FileSystems.getDefault().getPath(SYSTEM_TEMP, userId);
+    try {
+      Files.deleteIfExists(file);
+    } catch (IOException e) {
+      throw new AuthorizableGatewayException("Unable to delete user file " + file.toAbsolutePath(),
+          e);
+    }
+  }
+
+  @Override
+  public void removeUserFromOrg(String userId, String orgId) throws AuthorizableGatewayException {
+    Path orgDir = FileSystems.getDefault().getPath(SYSTEM_TEMP, orgId);
+    Path file = FileSystems.getDefault().getPath(SYSTEM_TEMP, orgId, userId);
+
+    if (!Files.exists(orgDir)) {
+      return;
     }
 
-    @Override
-    public void addUserToOrg(String userId, String orgId) throws AuthorizableGatewayException {
-        Path orgDir = FileSystems.getDefault().getPath(SYSTEM_TEMP, orgId);
-        Path file = FileSystems.getDefault().getPath(SYSTEM_TEMP, orgId, userId);
-
-        if (!Files.exists(orgDir)) {
-            try {
-                Files.createDirectory(orgDir);
-            } catch (IOException e) {
-                throw new AuthorizableGatewayException(
-                        "Unable to create org directory " + file.toAbsolutePath(), e);
-            }
-        }
-
-        try {
-            Files.createFile(file);
-        } catch (IOException e) {
-            throw new AuthorizableGatewayException(
-                    "Unable to create user file " + file.toAbsolutePath(), e);
-        }
+    try {
+      Files.deleteIfExists(file);
+    } catch (IOException e) {
+      throw new AuthorizableGatewayException(
+          "Unable to delete user file in org" + file.toAbsolutePath(), e);
     }
+  }
 
-    @Override
-    public void removeOrganization(String orgId, String orgName)
-            throws AuthorizableGatewayException {
-        Path dir = FileSystems.getDefault().getPath(SYSTEM_TEMP, orgId);
-        try {
-            DirectoryDeleter.deleteDirectoryRecursively(dir);
-        } catch (IOException e) {
-            throw new AuthorizableGatewayException(
-                    "Unable to delete directory " + dir.toAbsolutePath(), e);
-        }
-    }
-
-    @Override
-    public void removeUser(String userId, String userName) throws AuthorizableGatewayException {
-        Path file = FileSystems.getDefault().getPath(SYSTEM_TEMP, userId);
-        try {
-            Files.deleteIfExists(file);
-        } catch (IOException e) {
-            throw new AuthorizableGatewayException(
-                    "Unable to delete user file " + file.toAbsolutePath(), e);
-        }
-    }
-
-    @Override
-    public void removeUserFromOrg(String userId, String orgId) throws AuthorizableGatewayException {
-        Path orgDir = FileSystems.getDefault().getPath(SYSTEM_TEMP, orgId);
-        Path file = FileSystems.getDefault().getPath(SYSTEM_TEMP, orgId, userId);
-
-        if (!Files.exists(orgDir)) {
-            return;
-        }
-
-        try {
-            Files.deleteIfExists(file);
-        } catch (IOException e) {
-            throw new AuthorizableGatewayException(
-                    "Unable to delete user file in org" + file.toAbsolutePath(), e);
-        }
-    }
-
-    @Override
-    public String getName() {
-        return "FilesystemAuthorizable";
-    }
+  @Override
+  public String getName() {
+    return "FilesystemAuthorizable";
+  }
 }
