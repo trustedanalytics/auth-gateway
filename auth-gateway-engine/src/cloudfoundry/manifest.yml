@@ -5,8 +5,8 @@ applications:
   path: target/auth-gateway-engine-${version}.jar
   services:
   - kerberos-service
-  - zk-inst-plan-bare
-  - hdfs-inst-plan-bare
+  - zookeeper-instance-bare
+  - hdfs-instance-bare
   env:
     HDFS_SUPERUSER: hdfs
     HDFS_KEYTAB: placeholder
