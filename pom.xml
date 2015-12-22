@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>auth-gateway</artifactId>
-    <version>0.4.6</version>
+    <version>0.4.7</version>
     <packaging>pom</packaging>
 
     <name>auth-gateway</name>
@@ -17,6 +17,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	    <hadoop.utils.version>0.5.5</hadoop.utils.version>
+        <auth-gateway.version>${version}</auth-gateway.version>
     </properties>
 
     <modules>
