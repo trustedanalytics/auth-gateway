@@ -19,10 +19,10 @@ public class KerberosProperties {
   private final String realm;
   private final String technicalPrincipal;
   private final String keytabPrincipal;
-  private final byte[] keytab;
+  private final String keytab;
 
   public KerberosProperties(String kdc, String realm, String technicalUser, String keytabPrincipal,
-      byte[] keytab) {
+      String keytab) {
     this.realm = realm;
     this.kdc = kdc;
     this.technicalPrincipal = technicalUser;
@@ -46,7 +46,7 @@ public class KerberosProperties {
     return keytabPrincipal;
   }
 
-  public byte[] getKeytab() {
+  public String getKeytab() {
     return keytab;
   }
 }

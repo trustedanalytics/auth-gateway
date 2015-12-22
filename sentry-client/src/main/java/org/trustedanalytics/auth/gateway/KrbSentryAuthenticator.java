@@ -17,10 +17,8 @@ package org.trustedanalytics.auth.gateway;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.hadoop.security.authentication.util.KerberosName;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.trustedanalytics.hadoop.kerberos.KrbLoginManager;
@@ -54,8 +52,10 @@ public class KrbSentryAuthenticator implements SentryAuthenticator {
     return loginManager.getUGI(subject);
   }
 
-  public String getSuperUser() {
-    return conf.getSuperUser();
+  public String getSuperUser() throws IOException {
+    KerberosName princName =
+        new KerberosName(conf.getSuperUser().concat("@").concat(conf.getRealm()));
+    return princName.getShortName();
   }
 
   public String getRealm() {

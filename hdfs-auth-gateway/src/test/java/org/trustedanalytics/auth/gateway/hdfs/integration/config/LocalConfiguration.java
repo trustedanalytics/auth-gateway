@@ -32,7 +32,7 @@ public class LocalConfiguration {
 
   @Bean
   public KerberosProperties getKerberosProperties() throws IOException {
-    return new KerberosProperties("kdc", "krealm", "test_cf", "super", new byte[] {});
+    return new KerberosProperties("kdc", "krealm", "test_cf", "super", "base64");
   }
 
   @Bean

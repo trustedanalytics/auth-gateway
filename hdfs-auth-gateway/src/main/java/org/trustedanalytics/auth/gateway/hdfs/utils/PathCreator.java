@@ -31,12 +31,18 @@ public class PathCreator {
 
   private static final String TMP = "tmp";
 
+  private static final String APP = "apps";
+
   public Path createOrgBrokerPath(String org) {
     return createPath(ORGS, org, BROKER);
   }
 
   public Path createOrgTmpPath(String org) {
     return createPath(ORGS, org, TMP);
+  }
+
+  public Path createOrgAppPath(String org) {
+    return createPath(ORGS, org, APP);
   }
 
   public Path createOrgPath(String org) {

@@ -25,8 +25,10 @@
         <module>auth-gateway-spi</module>
         <module>auth-gateway-engine</module>
         <module>zookeeper-auth-gateway</module>
+        <module>group-mapping-gateway</module>
         <module>hdfs-auth-gateway</module>
         <module>sentry-client</module>
+        <module>auth-gateway-commons</module>
     </modules>
 
     <dependencies>

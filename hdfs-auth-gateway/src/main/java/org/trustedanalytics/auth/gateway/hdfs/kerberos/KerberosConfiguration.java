@@ -44,7 +44,7 @@ public class KerberosConfiguration {
     String realm = krbConf.getProperty(Property.KRB_REALM).get();
     String technicalUser = krbConf.getProperty(Property.USER).get();
     String principal = externalConfiguration.getSuperUser();
-    byte[] keytabFile = Base64.decodeBase64(externalConfiguration.getKeytab());
+    String keytabFile = externalConfiguration.getKeytab();
 
     return new KerberosProperties(kdc, realm, technicalUser, principal, keytabFile);
   }

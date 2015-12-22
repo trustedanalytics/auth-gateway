@@ -17,8 +17,9 @@ import org.apache.hadoop.fs.permission.FsAction;
 import org.apache.hadoop.fs.permission.FsPermission;
 
 public enum HdfsPermission {
-  USER_ONLY(new FsPermission(FsAction.ALL, FsAction.NONE, FsAction.NONE)),
-  USER_GROUP(new FsPermission(FsAction.ALL, FsAction.ALL, FsAction.NONE));
+  USER_ALL(new FsPermission(FsAction.ALL, FsAction.NONE, FsAction.NONE)),
+  USER_ALL_GROUP_ALL(new FsPermission(FsAction.ALL, FsAction.ALL, FsAction.NONE)),
+  USER_ALL_GROUP_READ_EXECUTE(new FsPermission(FsAction.ALL, FsAction.READ_EXECUTE, FsAction.NONE));
 
   private FsPermission permission;
 

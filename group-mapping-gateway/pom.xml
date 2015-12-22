@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>auth-gateway</artifactId>
+        <groupId>org.trustedanalytics</groupId>
+        <version>0.4.7</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>group-mapping-gateway</artifactId>
+    <name>group-mapping-gateway</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.trustedanalytics</groupId>
+            <artifactId>auth-gateway-spi</artifactId>
+            <version>${auth-gateway.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.trustedanalytics</groupId>
+            <artifactId>hadoop-utils</artifactId>
+            <version>${hadoop.utils.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security.kerberos</groupId>
+            <artifactId>spring-security-kerberos-client</artifactId>
+            <version>1.0.1.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.trustedanalytics</groupId>
+            <artifactId>auth-gateway-commons</artifactId>
+            <version>${auth-gateway.version}</version>
+        </dependency>
+    </dependencies>
+
+</project>

@@ -29,5 +29,5 @@ public interface SentryAuthenticator {
 
   String getRealm();
 
-  String getSuperUser();
+  String getSuperUser() throws IOException;
 }

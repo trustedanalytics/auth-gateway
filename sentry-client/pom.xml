@@ -18,6 +18,11 @@
             <version>${auth-gateway.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.trustedanalytics</groupId>
+            <artifactId>auth-gateway-commons</artifactId>
+            <version>${auth-gateway.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-common</artifactId>
             <version>${hadoop.version}</version>

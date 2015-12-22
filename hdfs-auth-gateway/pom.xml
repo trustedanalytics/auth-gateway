@@ -14,8 +14,8 @@
 
     <properties>
         <jacoco-measurement-instructions>0.7100</jacoco-measurement-instructions>
-        <jacoco-measurement-branches>0.9000</jacoco-measurement-branches>
-        <jacoco-measurement-lines>0.7200</jacoco-measurement-lines>
+        <jacoco-measurement-branches>0.8300</jacoco-measurement-branches>
+        <jacoco-measurement-lines>0.7000</jacoco-measurement-lines>
         <jacoco-measurement-classes>0.7200</jacoco-measurement-classes>
     </properties>
 
@@ -162,6 +162,11 @@
             <version>1.6.2</version>
             <scope>test</scope>
             <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>org.trustedanalytics</groupId>
+            <artifactId>auth-gateway-commons</artifactId>
+            <version>${auth-gateway.version}</version>
         </dependency>
     </dependencies>
 </project>

@@ -14,6 +14,7 @@
 package org.trustedanalytics.auth.gateway.hdfs;
 
 import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -44,13 +45,15 @@ public class HdfsGateway implements Authorizable {
   public void addOrganization(String orgId) throws AuthorizableGatewayException {
     try {
       hdfsClient.createDirectory(pathCreator.createOrgPath(orgId), orgId.concat(ADMIN_POSTFIX),
-          orgId, HdfsPermission.USER_ONLY.getPermission());
+          orgId, HdfsPermission.USER_ALL.getPermission());
       hdfsClient.createDirectory(pathCreator.createOrgUsersPath(orgId),
-          orgId.concat(ADMIN_POSTFIX), orgId, HdfsPermission.USER_ONLY.getPermission());
+          orgId.concat(ADMIN_POSTFIX), orgId, HdfsPermission.USER_ALL_GROUP_READ_EXECUTE.getPermission());
       hdfsClient.createDirectory(pathCreator.createOrgTmpPath(orgId), orgId.concat(ADMIN_POSTFIX),
-          orgId, HdfsPermission.USER_GROUP.getPermission());
+          orgId, HdfsPermission.USER_ALL_GROUP_ALL.getPermission());
+      hdfsClient.createDirectory(pathCreator.createOrgAppPath(orgId), orgId.concat(ADMIN_POSTFIX),
+          orgId, HdfsPermission.USER_ALL_GROUP_READ_EXECUTE.getPermission());
       hdfsClient.createDirectory(pathCreator.createOrgBrokerPath(orgId),
-          orgId.concat(ADMIN_POSTFIX), orgId, HdfsPermission.USER_ONLY.getPermission());
+          orgId.concat(ADMIN_POSTFIX), orgId, HdfsPermission.USER_ALL.getPermission());
 
       hdfsClient.setACLForDirectory(pathCreator.createOrgPath(orgId),
           kerberosProperties.getTechnicalPrincipal());
@@ -75,7 +78,7 @@ public class HdfsGateway implements Authorizable {
   public void addUserToOrg(String userId, String orgId) throws AuthorizableGatewayException {
     try {
       hdfsClient.createDirectory(pathCreator.createUserPath(orgId, userId), userId, orgId,
-          HdfsPermission.USER_ONLY.getPermission());
+          HdfsPermission.USER_ALL.getPermission());
     } catch (IOException e) {
       throw new AuthorizableGatewayException(String.format("Can't add user: %s", userId), e);
     }
@@ -86,7 +89,8 @@ public class HdfsGateway implements Authorizable {
     try {
       hdfsClient.deleteDirectory(pathCreator.createUserPath(orgId, userId));
     } catch (IOException e) {
-      throw new AuthorizableGatewayException(String.format("Can't add user: %s", userId), e);
+      throw new AuthorizableGatewayException(String.format("Can't remove user: %s from org: %s",
+          userId, orgId), e);
     }
   }
 

@@ -47,6 +47,8 @@ public class HdfsGatewayTest {
 
   private static final Path BROKER_PATH = new Path("/org/test_org/broker");
 
+  private static final Path APP_PATH = new Path("/org/test_org/apps");
+
   private static final Path USER_PATH = new Path("/org/test_org/user/test_user");
 
   @Mock
@@ -65,13 +67,17 @@ public class HdfsGatewayTest {
 
   private FsPermission groupPermission;
 
+  private FsPermission groupReadExecPermission;
+
   @Before
   public void init() throws IOException {
     userPermission = new FsPermission(FsAction.ALL, FsAction.NONE, FsAction.NONE);
     groupPermission = new FsPermission(FsAction.ALL, FsAction.ALL, FsAction.NONE);
+    groupReadExecPermission = new FsPermission(FsAction.ALL, FsAction.READ_EXECUTE, FsAction.NONE);
     when(pathCreator.createOrgPath("test_org")).thenReturn(ORG_PATH);
     when(pathCreator.createOrgBrokerPath("test_org")).thenReturn(BROKER_PATH);
     when(pathCreator.createOrgTmpPath("test_org")).thenReturn(TMP_PATH);
+    when(pathCreator.createOrgAppPath("test_org")).thenReturn(APP_PATH);
     when(pathCreator.createOrgUsersPath("test_org")).thenReturn(ORG_USERS_PATH);
     when(pathCreator.createUserPath("test_org", "test_user")).thenReturn(USER_PATH);
     when(kerberosProperties.getTechnicalPrincipal()).thenReturn("test_cf");
@@ -84,8 +90,9 @@ public class HdfsGatewayTest {
     verify(hdfsClient).createDirectory(ORG_PATH, "test_org_admin", "test_org", userPermission);
     verify(hdfsClient).createDirectory(BROKER_PATH, "test_org_admin", "test_org", userPermission);
     verify(hdfsClient)
-        .createDirectory(ORG_USERS_PATH, "test_org_admin", "test_org", userPermission);
+        .createDirectory(ORG_USERS_PATH, "test_org_admin", "test_org", groupReadExecPermission);
     verify(hdfsClient).createDirectory(TMP_PATH, "test_org_admin", "test_org", groupPermission);
+    verify(hdfsClient).createDirectory(APP_PATH, "test_org_admin", "test_org", groupReadExecPermission);
     verify(hdfsClient).setACLForDirectory(ORG_PATH, "test_cf");
     verify(hdfsClient).setACLForDirectory(BROKER_PATH, "test_cf");
   }

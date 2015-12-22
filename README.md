@@ -39,7 +39,16 @@ Hdfs provider is an optional part of the gateway, which is responsible for creat
 * **Configuration without Kerberos**
   
   When hdfs provider running without kerberos it not require HDFS_KEYTAB, HDFS_SUPERUSER will be used as a name of superuser in hdfs.
+
+#### Group Mapping Provider
+Group Mapping provider is an optional part of the gateway, which is responsible for creating groups and users:
+
+* **Configuration with Kerberos**
+  Kerberos mode requires providing keytab file as base64 in HGM_PRINCIPAL_KEYTAB environment variable and HGM_PRINCIPAL who is created and configured principal for Hadoop Group Mapping service.
   
+* **Configuration without Kerberos**
+  When group mapping running without kerberos it will use HTTPS to communicate with Hadoop Group Mapping service, so instead of principal and his keytab, you need to provide HGM_USERNAME and HGM_PASSWORD.
+
 #### Sentry provider
 Sentry provider can work only in kerberos environment. For non-kerberos deployments do not add "sentry-auth-gateway" profile to
 SPRING_PROFILES_ACTIVE environment variable. Sentry provider is responsible for managing sentry roles (Role-Base Administration). 

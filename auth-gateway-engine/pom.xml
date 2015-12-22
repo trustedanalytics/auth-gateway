@@ -13,7 +13,7 @@
         <start-class>org.trustedanalytics.auth.gateway.Application</start-class>
         <jacoco-measurement-instructions>0.8000</jacoco-measurement-instructions>
         <jacoco-measurement-branches>0.7000</jacoco-measurement-branches>
-        <jacoco-measurement-lines>0.8000</jacoco-measurement-lines>
+        <jacoco-measurement-lines>0.6000</jacoco-measurement-lines>
         <jacoco-measurement-classes>0.8500</jacoco-measurement-classes>
     </properties>
 
@@ -32,6 +32,21 @@
             <groupId>org.trustedanalytics</groupId>
             <artifactId>hdfs-auth-gateway</artifactId>
             <version>${auth-gateway.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.trustedanalytics</groupId>
+            <artifactId>group-mapping-gateway</artifactId>
+            <version>${auth-gateway.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.cloud</groupId>
+                    <artifactId>spring-cloud-starter-security</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework.cloud</groupId>
+                    <artifactId>spring-cloud-security</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.trustedanalytics</groupId>

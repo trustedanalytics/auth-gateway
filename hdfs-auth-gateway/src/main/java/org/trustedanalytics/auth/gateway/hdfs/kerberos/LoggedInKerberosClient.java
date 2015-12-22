@@ -23,8 +23,10 @@ import javax.security.auth.login.LoginException;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.security.authentication.util.KerberosName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.trustedanalytics.auth.gateway.KeyTab;
 import org.trustedanalytics.hadoop.config.client.Configurations;
 import org.trustedanalytics.hadoop.config.client.ServiceType;
 import org.trustedanalytics.hadoop.kerberos.KrbLoginManager;
@@ -36,25 +38,16 @@ public class LoggedInKerberosClient {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LoggedInKerberosClient.class);
 
-  private final String keyTabFilePath;
-
   private KerberosProperties kerberosProperties;
 
   private Configuration configuration;
 
+  private static final String KRB_PRINC_TO_SYS_USER_NAME_RULES = "hadoop.security.auth_to_local";
+
   public LoggedInKerberosClient(KerberosProperties kerberosProperties) throws IOException,
       LoginException, KrbException {
-    this.keyTabFilePath = "/tmp/superuser.keytab";
     this.kerberosProperties = kerberosProperties;
-    this.saveKeytabIfNotExists();
     this.loginInToHadoop();
-  }
-
-  @VisibleForTesting
-  LoggedInKerberosClient(KerberosProperties kerberosProperties, String path) throws IOException {
-    this.kerberosProperties = kerberosProperties;
-    this.keyTabFilePath = path;
-    this.saveKeytabIfNotExists();
   }
 
   public Configuration getConfiguration() {
@@ -71,21 +64,9 @@ public class LoggedInKerberosClient {
     configuration =
         Configurations.newInstanceFromEnv().getServiceConfig(ServiceType.HDFS_TYPE)
             .asHadoopConfiguration();
-    loginManager.loginInHadoop(
-        loginManager.loginWithKeyTab(kerberosProperties.getKeytabPrincipal(), keyTabFilePath),
-        configuration);
-  }
-
-  private void saveKeytabIfNotExists() throws IOException {
-    Path path = Paths.get(keyTabFilePath);
-    if (Files.notExists(path)) {
-      Files.write(path, kerberosProperties.getKeytab(), StandardOpenOption.CREATE_NEW);
-    } else if (Files.isDirectory(path)) {
-      throw new IOException(
-          String
-              .format(
-                  "Under path %s exists directory. It's path where hdfs superuser keytab is stored. Please move or delete this directory",
-                  keyTabFilePath));
-    }
+    loginManager.loginInHadoop(loginManager.loginWithKeyTab(
+        kerberosProperties.getKeytabPrincipal(),
+        KeyTab.createInstance(kerberosProperties.getKeytab(),
+            kerberosProperties.getKeytabPrincipal()).getFullKeyTabFilePath()), configuration);
   }
 }

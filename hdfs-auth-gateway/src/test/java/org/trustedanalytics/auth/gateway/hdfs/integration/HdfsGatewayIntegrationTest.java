@@ -56,6 +56,8 @@ public class HdfsGatewayIntegrationTest {
 
   private FsPermission aclUserPermission;
 
+  private FsPermission groupReadExecPermission;
+
   private static final Path TEST_ORG_ROOT = new Path("/org");
 
   private static final Path TEST_ORG_PATH = new Path("/org/intel");
@@ -74,6 +76,7 @@ public class HdfsGatewayIntegrationTest {
     userPermission = new FsPermission(FsAction.ALL, FsAction.NONE, FsAction.NONE);
     groupPermission = new FsPermission(FsAction.ALL, FsAction.ALL, FsAction.NONE);
     aclUserPermission = new FsPermission(FsAction.ALL, FsAction.ALL, FsAction.NONE);
+    groupReadExecPermission = new FsPermission(FsAction.ALL, FsAction.READ_EXECUTE, FsAction.NONE);
   }
 
   @Test
@@ -82,7 +85,7 @@ public class HdfsGatewayIntegrationTest {
     hdfsGateway.addOrganization("intel");
 
     checkIfDirectoryExistsWithPermissions(TEST_ORG_PATH, "intel_admin", aclUserPermission);
-    checkIfDirectoryExistsWithPermissions(TEST_ORG_USERS_PATH, "intel_admin", userPermission);
+    checkIfDirectoryExistsWithPermissions(TEST_ORG_USERS_PATH, "intel_admin", groupReadExecPermission);
     checkIfDirectoryExistsWithPermissions(TEST_ORG_TMP_PATH, "intel_admin", groupPermission);
 
     checkIfDirectoryExistsWithACL(TEST_ORG_PATH, "intel_admin", "test_cf");

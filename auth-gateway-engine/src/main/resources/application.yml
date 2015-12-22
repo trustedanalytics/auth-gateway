@@ -1,8 +1,16 @@
 engine:
   timeout: 10
 hdfs:
-  clientKeytab: ${hdfs.keytab:}
   superUser: ${hdfs.superuser:}
+  clientKeytab: ${hdfs.keytab:}
+group.mapping:
+  url: ${hgm.url}
+  kerberos:
+    principal: ${hgm.principal:}
+    principalKeyTab: ${hgm.principal.keytab:}
+  https:
+    username: ${hgm.username:}
+    password: ${hgm.password:}
 sentry.server:
   address: ${sentry.address:}
   port: ${sentry.port:8038}
