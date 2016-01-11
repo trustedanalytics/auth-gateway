@@ -13,7 +13,16 @@
  */
 package org.trustedanalytics.auth.gateway.hdfs;
 
+import static org.mockito.Mockito.verify;
+import static org.powermock.api.mockito.PowerMockito.doThrow;
+import static org.powermock.api.mockito.PowerMockito.when;
+
+import java.io.IOException;
+import java.util.List;
+
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.permission.AclEntry;
+import org.apache.hadoop.fs.permission.AclEntryType;
 import org.apache.hadoop.fs.permission.FsAction;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.junit.Before;
@@ -25,12 +34,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.trustedanalytics.auth.gateway.hdfs.kerberos.KerberosProperties;
 import org.trustedanalytics.auth.gateway.hdfs.utils.PathCreator;
 import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
-
-import java.io.IOException;
-
-import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.doThrow;
-import static org.powermock.api.mockito.PowerMockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class HdfsGatewayTest {
@@ -45,7 +48,11 @@ public class HdfsGatewayTest {
 
   private static final Path TMP_PATH = new Path("/org/test_org/tmp");
 
-  private static final Path BROKER_PATH = new Path("/org/test_org/broker");
+  private static final Path BROKER_PATH = new Path("/org/test_org/brokers");
+
+  private static final Path BROKER_METADATA_PATH = new Path("/org/test_org/brokers/metadata");
+
+  private static final Path BROKER_USERSPACE_PATH = new Path("/org/test_org/brokers/userspace");
 
   private static final Path APP_PATH = new Path("/org/test_org/apps");
 
@@ -67,15 +74,23 @@ public class HdfsGatewayTest {
 
   private FsPermission groupPermission;
 
-  private FsPermission groupReadExecPermission;
+  private FsPermission groupExecPermission;
+
+  private List<AclEntry> groupAcl;
+
+  private List<AclEntry> userAcl;
 
   @Before
   public void init() throws IOException {
     userPermission = new FsPermission(FsAction.ALL, FsAction.NONE, FsAction.NONE);
     groupPermission = new FsPermission(FsAction.ALL, FsAction.ALL, FsAction.NONE);
-    groupReadExecPermission = new FsPermission(FsAction.ALL, FsAction.READ_EXECUTE, FsAction.NONE);
+    groupExecPermission = new FsPermission(FsAction.ALL, FsAction.EXECUTE, FsAction.NONE);
+    groupAcl = hdfsClient.getAcl("test_org", FsAction.EXECUTE, AclEntryType.GROUP);
+    userAcl = hdfsClient.getAcl("test_cf", FsAction.ALL, AclEntryType.USER);
     when(pathCreator.createOrgPath("test_org")).thenReturn(ORG_PATH);
     when(pathCreator.createOrgBrokerPath("test_org")).thenReturn(BROKER_PATH);
+    when(pathCreator.createBrokerUserspacePath("test_org")).thenReturn(BROKER_USERSPACE_PATH);
+    when(pathCreator.createBrokerMetadataPath("test_org")).thenReturn(BROKER_METADATA_PATH);
     when(pathCreator.createOrgTmpPath("test_org")).thenReturn(TMP_PATH);
     when(pathCreator.createOrgAppPath("test_org")).thenReturn(APP_PATH);
     when(pathCreator.createOrgUsersPath("test_org")).thenReturn(ORG_USERS_PATH);
@@ -87,21 +102,28 @@ public class HdfsGatewayTest {
   public void addOrganization_createDirectoryCalled_creationSuccess()
       throws AuthorizableGatewayException, IOException {
     hdfsGateway.addOrganization(ORG);
-    verify(hdfsClient).createDirectory(ORG_PATH, "test_org_admin", "test_org", userPermission);
-    verify(hdfsClient).createDirectory(BROKER_PATH, "test_org_admin", "test_org", userPermission);
-    verify(hdfsClient)
-        .createDirectory(ORG_USERS_PATH, "test_org_admin", "test_org", groupReadExecPermission);
+    verify(hdfsClient).createDirectory(ORG_PATH, "test_org_admin", "test_org", groupExecPermission);
+    verify(hdfsClient).createDirectory(ORG_USERS_PATH, "test_org_admin", "test_org",
+        groupExecPermission);
     verify(hdfsClient).createDirectory(TMP_PATH, "test_org_admin", "test_org", groupPermission);
-    verify(hdfsClient).createDirectory(APP_PATH, "test_org_admin", "test_org", groupReadExecPermission);
-    verify(hdfsClient).setACLForDirectory(ORG_PATH, "test_cf");
-    verify(hdfsClient).setACLForDirectory(BROKER_PATH, "test_cf");
+    verify(hdfsClient).createDirectory(APP_PATH, "test_org_admin", "test_org", groupExecPermission);
+    verify(hdfsClient).createDirectory(BROKER_PATH, "test_org_admin", "test_org",
+        groupExecPermission);
+    verify(hdfsClient).createDirectory(BROKER_USERSPACE_PATH, "test_org_admin", "test_org",
+        groupExecPermission);
+    verify(hdfsClient).createDirectory(BROKER_METADATA_PATH, "test_org_admin", "test_org",
+        groupExecPermission);
+    verify(hdfsClient).setACLForDirectory(ORG_PATH, userAcl);
+    verify(hdfsClient).setACLForDirectory(BROKER_PATH, userAcl);
+    verify(hdfsClient).setACLForDirectory(BROKER_USERSPACE_PATH, userAcl);
+    verify(hdfsClient).setACLForDirectory(BROKER_METADATA_PATH, userAcl);
   }
 
   @Test(expected = AuthorizableGatewayException.class)
   public void addOrganization_hdfsClientThrowIOException_throwAuthorizableGatewayException()
       throws AuthorizableGatewayException, IOException {
     doThrow(new IOException()).when(hdfsClient).createDirectory(ORG_PATH, "test_org_admin",
-        "test_org", userPermission);
+        "test_org", groupExecPermission);
     hdfsGateway.addOrganization(ORG);
   }
 

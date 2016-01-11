@@ -14,12 +14,18 @@
 package org.trustedanalytics.auth.gateway.hdfs;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.configuration.SystemConfiguration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.permission.*;
+import org.apache.hadoop.fs.permission.FsPermission;
+import org.apache.hadoop.fs.permission.AclEntryScope;
+import org.apache.hadoop.fs.permission.AclEntryType;
+import org.apache.hadoop.fs.permission.AclEntry;
+import org.apache.hadoop.fs.permission.FsAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,38 +64,25 @@ public class HdfsClient {
     }
   }
 
-  public void setACLForDirectory(Path path, String user) throws IOException {
+  public void setACLForDirectory(Path path, List<AclEntry> aclEntries) throws IOException {
     FileSystem fileSystem = fileSystemProvider.getFileSystem();
-    fileSystem.setAcl(path, createAclForUser(user));
+    fileSystem.modifyAclEntries(path, aclEntries);
   }
 
-  private List<AclEntry> createAclForUser(String user) {
+  public List<AclEntry> getAcl(String user, FsAction action, AclEntryType aclEntryType) {
     return Arrays.asList(
-        new AclEntry.Builder()
-            .setScope(AclEntryScope.ACCESS)
-            .setPermission(FsAction.ALL)
-            .setType(AclEntryType.USER)
-            .build(),
         new AclEntry.Builder()
             .setName(user)
             .setScope(AclEntryScope.ACCESS)
-            .setPermission(FsAction.ALL)
-            .setType(AclEntryType.USER)
+            .setPermission(action)
+            .setType(aclEntryType)
             .build(),
         new AclEntry.Builder()
             .setScope(AclEntryScope.ACCESS)
-            .setPermission(FsAction.NONE)
-            .setType(AclEntryType.GROUP)
-            .build(),
-        new AclEntry.Builder()
-            .setScope(AclEntryScope.ACCESS)
-            .setPermission(FsAction.NONE)
-            .setType(AclEntryType.OTHER)
-            .build(),
-        new AclEntry.Builder()
-            .setScope(AclEntryScope.ACCESS)
-            .setPermission(FsAction.ALL)
+            .setPermission(action)
             .setType(AclEntryType.MASK)
-            .build());
+            .build()
+        );
   }
+
 }

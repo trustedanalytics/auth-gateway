@@ -30,6 +30,7 @@ Hdfs provider is an optional part of the gateway, which is responsible for creat
 * /org/org_name/ - organization directory - permissions set for user org_admin
 * /org/org_name/tmp - temporary directory - permissions set for group org
 * /org/org_name/broker - broker directory - permissions set for user org_admin
+* /org/org_name/apps/ - applications directory - permissions set for user org
 * /org/org_name/users/ - users directories - permissions set for user org_admin
 * /org/org_name/users/user_name - directory for each user in organization - permissions set for user
 

@@ -15,8 +15,7 @@ package org.trustedanalytics.auth.gateway.hdfs;
 
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.permission.FsAction;
-import org.apache.hadoop.fs.permission.FsPermission;
+import org.apache.hadoop.fs.permission.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,7 +26,10 @@ import org.trustedanalytics.auth.gateway.hdfs.config.ExternalConfiguration;
 import org.trustedanalytics.auth.gateway.hdfs.config.FileSystemProvider;
 
 import java.io.IOException;
+import java.util.List;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.when;
@@ -102,4 +104,14 @@ public class HdfsClientTest {
     verify(fileSystem, times(0)).setOwner(TEST_PATH, "test_admin", "test");
     verify(fileSystemProvider).getFileSystem();
   }
+
+  @Test
+  public void getAcl_getAclCalled_aclEntryCreated() throws IOException {
+    List<AclEntry> userAcl = hdfsClient.getAcl("test_user", FsAction.ALL, AclEntryType.USER);
+    assertThat(userAcl.get(0).getPermission(), equalTo(FsAction.ALL));
+    assertThat(userAcl.get(0).getType(), equalTo(AclEntryType.USER));;
+    assertThat(userAcl.get(0).getName(), equalTo("test_user"));
+  }
+
+
 }

@@ -21,13 +21,15 @@ import org.springframework.context.annotation.Profile;
 @Configuration
 public class PathCreator {
 
-  private static final String DELIMITER = "/";
-
   private static final String ORGS = "org";
 
   private static final String USER = "user";
 
   private static final String BROKER = "brokers";
+
+  private static final String BROKER_METADATA = "metadata";
+
+  private static final String BROKER_USERSPACE = "userspace";
 
   private static final String TMP = "tmp";
 
@@ -35,6 +37,14 @@ public class PathCreator {
 
   public Path createOrgBrokerPath(String org) {
     return createPath(ORGS, org, BROKER);
+  }
+
+  public Path createBrokerUserspacePath(String org) {
+    return createPath(ORGS, org, BROKER, BROKER_USERSPACE);
+  }
+
+  public Path createBrokerMetadataPath(String org) {
+    return createPath(ORGS, org, BROKER, BROKER_METADATA);
   }
 
   public Path createOrgTmpPath(String org) {
@@ -58,7 +68,7 @@ public class PathCreator {
   }
 
   private Path createPath(String... args) {
-    return getPath(DELIMITER.concat((String.join(DELIMITER, args))));
+    return getPath(Path.SEPARATOR.concat((String.join(Path.SEPARATOR, args))));
   }
 
   private Path getPath(String relativePath) {

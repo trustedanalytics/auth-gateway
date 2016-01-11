@@ -19,7 +19,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.io.IOException;
 import java.util.Optional;
 
-import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.*;
@@ -56,7 +55,7 @@ public class HdfsGatewayIntegrationTest {
 
   private FsPermission aclUserPermission;
 
-  private FsPermission groupReadExecPermission;
+  private FsPermission groupExecPermission;
 
   private static final Path TEST_ORG_ROOT = new Path("/org");
 
@@ -64,19 +63,27 @@ public class HdfsGatewayIntegrationTest {
 
   private static final Path TEST_ORG_BROKER_PATH = new Path("/org/intel/brokers");
 
+  private static final Path TEST_ORG_METADATA_PATH = new Path("/org/intel/brokers/metadata");
+
+  private static final Path TEST_ORG_USERSPACE_PATH = new Path("/org/intel/brokers/userspace");
+
   private static final Path TEST_ORG_USERS_PATH = new Path("/org/intel/user");
 
   private static final Path TEST_ORG_TMP_PATH = new Path("/org/intel/tmp");
+
+  private static final Path TEST_ORG_APP_PATH = new Path("/org/intel/apps");
 
   private static final Path TEST_USER_PATH = new Path("/org/intel/user/test_user");
 
   @Before
   public void init() throws IOException {
-    fileSystem = fileSystemProvider.getFileSystem();
     userPermission = new FsPermission(FsAction.ALL, FsAction.NONE, FsAction.NONE);
     groupPermission = new FsPermission(FsAction.ALL, FsAction.ALL, FsAction.NONE);
     aclUserPermission = new FsPermission(FsAction.ALL, FsAction.ALL, FsAction.NONE);
-    groupReadExecPermission = new FsPermission(FsAction.ALL, FsAction.READ_EXECUTE, FsAction.NONE);
+    groupExecPermission = new FsPermission(FsAction.ALL, FsAction.EXECUTE, FsAction.NONE);
+
+    fileSystem = fileSystemProvider.getFileSystem();
+    fileSystem.mkdirs(TEST_ORG_ROOT, userPermission);
   }
 
   @Test
@@ -84,12 +91,18 @@ public class HdfsGatewayIntegrationTest {
       throws IOException, AuthorizableGatewayException {
     hdfsGateway.addOrganization("intel");
 
-    checkIfDirectoryExistsWithPermissions(TEST_ORG_PATH, "intel_admin", aclUserPermission);
-    checkIfDirectoryExistsWithPermissions(TEST_ORG_USERS_PATH, "intel_admin", groupReadExecPermission);
+    checkIfDirectoryExistsWithPermissions(TEST_ORG_PATH, "intel_admin", groupExecPermission);
+    checkIfDirectoryExistsWithPermissions(TEST_ORG_USERS_PATH, "intel_admin", groupExecPermission);
     checkIfDirectoryExistsWithPermissions(TEST_ORG_TMP_PATH, "intel_admin", groupPermission);
+    checkIfDirectoryExistsWithPermissions(TEST_ORG_APP_PATH, "intel_admin", groupExecPermission);
+    checkIfDirectoryExistsWithPermissions(TEST_ORG_BROKER_PATH, "intel_admin", groupExecPermission);
+    checkIfDirectoryExistsWithPermissions(TEST_ORG_METADATA_PATH, "intel_admin", aclUserPermission);
+    checkIfDirectoryExistsWithPermissions(TEST_ORG_USERSPACE_PATH, "intel_admin", aclUserPermission);
 
     checkIfDirectoryExistsWithACL(TEST_ORG_PATH, "intel_admin", "test_cf");
     checkIfDirectoryExistsWithACL(TEST_ORG_BROKER_PATH, "intel_admin", "test_cf");
+    checkIfDirectoryExistsWithACL(TEST_ORG_METADATA_PATH, "intel_admin", "test_cf");
+    checkIfDirectoryExistsWithACL(TEST_ORG_USERSPACE_PATH, "intel_admin", "test_cf");
   }
 
   @Test
@@ -97,14 +110,14 @@ public class HdfsGatewayIntegrationTest {
       AuthorizableGatewayException {
     hdfsGateway.addOrganization("intel");
     hdfsGateway.addOrganization("intel");
-    checkIfDirectoryExistsWithPermissions(TEST_ORG_PATH, "intel_admin", aclUserPermission);
+    checkIfDirectoryExistsWithPermissions(TEST_ORG_PATH, "intel_admin", groupExecPermission);
   }
 
   @Test
   public void createOrgWithUsers_directoryExistWithPermissionsAndOwner_createDirectories()
       throws IOException, AuthorizableGatewayException {
     hdfsGateway.addOrganization("intel");
-    checkIfDirectoryExistsWithPermissions(TEST_ORG_PATH, "intel_admin", aclUserPermission);
+    checkIfDirectoryExistsWithPermissions(TEST_ORG_PATH, "intel_admin", groupExecPermission);
     hdfsGateway.addUserToOrg("test_user", "intel");
     checkIfDirectoryExistsWithPermissions(TEST_USER_PATH, "test_user", userPermission);
   }
@@ -113,7 +126,7 @@ public class HdfsGatewayIntegrationTest {
   public void createSecondUserWithSameName_createDirectories_doNothing() throws IOException,
       AuthorizableGatewayException {
     hdfsGateway.addOrganization("intel");
-    checkIfDirectoryExistsWithPermissions(TEST_ORG_PATH, "intel_admin", aclUserPermission);
+    checkIfDirectoryExistsWithPermissions(TEST_ORG_PATH, "intel_admin", groupExecPermission);
     hdfsGateway.addUserToOrg("test_user", "intel");
     hdfsGateway.addUserToOrg("test_user", "intel");
     checkIfDirectoryExistsWithPermissions(TEST_USER_PATH, "test_user", userPermission);
@@ -123,7 +136,7 @@ public class HdfsGatewayIntegrationTest {
   public void deleteEmptyOrg_subDirectoriesNotExists_deleteDirectory() throws IOException,
       AuthorizableGatewayException {
     hdfsGateway.addOrganization("intel");
-    checkIfDirectoryExistsWithPermissions(TEST_ORG_PATH, "intel_admin", aclUserPermission);
+    checkIfDirectoryExistsWithPermissions(TEST_ORG_PATH, "intel_admin", groupExecPermission);
 
     hdfsGateway.removeOrganization("intel");
     assertThat(fileSystem.exists(TEST_ORG_PATH), equalTo(false));
@@ -133,7 +146,7 @@ public class HdfsGatewayIntegrationTest {
   public void deleteOrgWithUsers_subDirectoriesExists_deleteDirectoryWithSubDirectories()
       throws IOException, AuthorizableGatewayException {
     hdfsGateway.addOrganization("intel");
-    checkIfDirectoryExistsWithPermissions(TEST_ORG_PATH, "intel_admin", aclUserPermission);
+    checkIfDirectoryExistsWithPermissions(TEST_ORG_PATH, "intel_admin", groupExecPermission);
     hdfsGateway.addUserToOrg("test_user", "intel");
     checkIfDirectoryExistsWithPermissions(TEST_USER_PATH, "test_user", userPermission);
 

@@ -14,7 +14,12 @@
 package org.trustedanalytics.auth.gateway.hdfs;
 
 import java.io.IOException;
+import java.util.List;
 
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.permission.AclEntry;
+import org.apache.hadoop.fs.permission.AclEntryType;
+import org.apache.hadoop.fs.permission.FsAction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -44,21 +49,29 @@ public class HdfsGateway implements Authorizable {
   @Override
   public void addOrganization(String orgId) throws AuthorizableGatewayException {
     try {
-      hdfsClient.createDirectory(pathCreator.createOrgPath(orgId), orgId.concat(ADMIN_POSTFIX),
-          orgId, HdfsPermission.USER_ALL.getPermission());
-      hdfsClient.createDirectory(pathCreator.createOrgUsersPath(orgId),
-          orgId.concat(ADMIN_POSTFIX), orgId, HdfsPermission.USER_ALL_GROUP_READ_EXECUTE.getPermission());
-      hdfsClient.createDirectory(pathCreator.createOrgTmpPath(orgId), orgId.concat(ADMIN_POSTFIX),
-          orgId, HdfsPermission.USER_ALL_GROUP_ALL.getPermission());
-      hdfsClient.createDirectory(pathCreator.createOrgAppPath(orgId), orgId.concat(ADMIN_POSTFIX),
-          orgId, HdfsPermission.USER_ALL_GROUP_READ_EXECUTE.getPermission());
-      hdfsClient.createDirectory(pathCreator.createOrgBrokerPath(orgId),
-          orgId.concat(ADMIN_POSTFIX), orgId, HdfsPermission.USER_ALL.getPermission());
+      hdfsClient.createDirectory(pathCreator.createOrgPath(orgId), orgId.concat(ADMIN_POSTFIX),orgId,
+          HdfsPermission.USER_ALL_GROUP_EXECUTE.getPermission());
+      hdfsClient.createDirectory(pathCreator.createOrgUsersPath(orgId), orgId.concat(ADMIN_POSTFIX), orgId,
+          HdfsPermission.USER_ALL_GROUP_EXECUTE.getPermission());
+      hdfsClient.createDirectory(pathCreator.createOrgTmpPath(orgId), orgId.concat(ADMIN_POSTFIX), orgId,
+          HdfsPermission.USER_ALL_GROUP_ALL.getPermission());
+      hdfsClient.createDirectory(pathCreator.createOrgAppPath(orgId), orgId.concat(ADMIN_POSTFIX), orgId,
+          HdfsPermission.USER_ALL_GROUP_EXECUTE.getPermission());
+      hdfsClient.createDirectory(pathCreator.createOrgBrokerPath(orgId), orgId.concat(ADMIN_POSTFIX), orgId,
+          HdfsPermission.USER_ALL_GROUP_EXECUTE.getPermission());
+      hdfsClient.createDirectory(pathCreator.createBrokerMetadataPath(orgId), orgId.concat(ADMIN_POSTFIX), orgId,
+          HdfsPermission.USER_ALL_GROUP_EXECUTE.getPermission());
+      hdfsClient.createDirectory(pathCreator.createBrokerUserspacePath(orgId), orgId.concat(ADMIN_POSTFIX), orgId,
+          HdfsPermission.USER_ALL_GROUP_EXECUTE.getPermission());
 
-      hdfsClient.setACLForDirectory(pathCreator.createOrgPath(orgId),
-          kerberosProperties.getTechnicalPrincipal());
-      hdfsClient.setACLForDirectory(pathCreator.createOrgBrokerPath(orgId),
-          kerberosProperties.getTechnicalPrincipal());
+      List<AclEntry> acl_execute = hdfsClient.getAcl(kerberosProperties.getTechnicalPrincipal(), FsAction.EXECUTE,
+          AclEntryType.USER);
+      List<AclEntry> acl_user = hdfsClient.getAcl(kerberosProperties.getTechnicalPrincipal(), FsAction.ALL,
+          AclEntryType.USER);
+      hdfsClient.setACLForDirectory(pathCreator.createOrgPath(orgId), acl_execute);
+      hdfsClient.setACLForDirectory(pathCreator.createOrgBrokerPath(orgId), acl_execute);
+      hdfsClient.setACLForDirectory(pathCreator.createBrokerMetadataPath(orgId), acl_user);
+      hdfsClient.setACLForDirectory(pathCreator.createBrokerUserspacePath(orgId), acl_user);
     } catch (IOException e) {
       throw new AuthorizableGatewayException(String.format("Can't add organization: %s", orgId), e);
     }

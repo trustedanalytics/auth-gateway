@@ -37,8 +37,11 @@ public final class User {
     if (obj == this)
       return true;
     User user = (User) obj;
-    return new EqualsBuilder()
-        .append(username, user.getName())
-        .isEquals();
+    return username.equals(user.getName());
+  }
+
+  @Override
+  public int hashCode() {
+    return username.hashCode();
   }
 }
