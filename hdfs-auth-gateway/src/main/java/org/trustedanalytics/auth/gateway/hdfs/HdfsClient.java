@@ -80,6 +80,11 @@ public class HdfsClient {
         new AclEntry.Builder()
             .setScope(AclEntryScope.ACCESS)
             .setPermission(action)
+            .setType(AclEntryType.GROUP)
+            .build(),
+        new AclEntry.Builder()
+            .setScope(AclEntryScope.ACCESS)
+            .setPermission(action)
             .setType(AclEntryType.MASK)
             .build()
         );
