@@ -18,9 +18,6 @@ package org.trustedanalytics.auth.gateway;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-import org.trustedanalytics.hadoop.config.client.Configurations;
-import org.trustedanalytics.hadoop.config.client.Property;
-import org.trustedanalytics.hadoop.config.client.ServiceInstanceConfiguration;
 
 import java.io.IOException;
 
@@ -43,16 +40,13 @@ public class KrbClientConfiguration {
 
   private String keyTabPath;
 
-  private static final String KRB_CONF_SERVICE_NAME = "kerberos-service";
-
   private static final String KRB_PRINC_TO_SYS_USER_NAME_RULES = "hadoop.security.auth_to_local";
 
   @PostConstruct
   public void initialize() throws IOException, LoginException {
-    ServiceInstanceConfiguration krbServiceConf =
-        Configurations.newInstanceFromEnv().getServiceConfig(KRB_CONF_SERVICE_NAME);
-    kdc = krbServiceConf.getProperty(Property.KRB_KDC).get();
-    realm = krbServiceConf.getProperty(Property.KRB_REALM).get();
+    SystemEnvironment systemEnvironment = new SystemEnvironment();
+    kdc = systemEnvironment.getVariable(SystemEnvironment.KRB_KDC);
+    realm = systemEnvironment.getVariable(SystemEnvironment.KRB_REALM);
     keyTabPath = KeyTab.createInstance(clientKeyTab, superUser).getFullKeyTabFilePath();
   }
 

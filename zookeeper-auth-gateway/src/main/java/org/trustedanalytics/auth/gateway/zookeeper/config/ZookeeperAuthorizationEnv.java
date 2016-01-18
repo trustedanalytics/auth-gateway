@@ -14,29 +14,17 @@
 
 package org.trustedanalytics.auth.gateway.zookeeper.config;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.trustedanalytics.auth.gateway.SystemEnvironment;
 import org.trustedanalytics.auth.gateway.zookeeper.kerberos.KerberosProperties;
-import org.trustedanalytics.hadoop.config.client.AppConfiguration;
-import org.trustedanalytics.hadoop.config.client.Configurations;
-import org.trustedanalytics.hadoop.config.client.Property;
-import org.trustedanalytics.hadoop.config.client.ServiceInstanceConfiguration;
-import org.trustedanalytics.hadoop.config.client.ServiceType;
 
 import java.io.IOException;
 
 public class ZookeeperAuthorizationEnv {
 
-  private final static Logger LOGGER = LoggerFactory.getLogger(ZookeeperAuthorizationEnv.class);
-  private final AppConfiguration appConf;
-
-  public ZookeeperAuthorizationEnv() throws IOException {
-    this.appConf = Configurations.newInstanceFromEnv();
-  }
+  private static final String ZK_CLUSTER_URL = "ZK_CLUSTER_URL";
 
   public String zookeeperQuorum() {
-    ServiceInstanceConfiguration zkConf = appConf.getServiceConfig(ServiceType.ZOOKEEPER_TYPE);
-    return get(zkConf, Property.ZOOKEPER_URI, null);
+    return new SystemEnvironment().getVariable(ZK_CLUSTER_URL);
   }
 
   public String zookeeperRootNode() {
@@ -44,33 +32,12 @@ public class ZookeeperAuthorizationEnv {
   }
 
   public KerberosProperties kerberosProperties() throws IOException {
-    AppConfiguration appConfig = Configurations.newInstanceFromEnv();
-    ServiceInstanceConfiguration krbConf = appConfig.getServiceConfig("kerberos-service");
-
     KerberosProperties krbProps = new KerberosProperties();
-    krbProps.setKdc(get(krbConf, Property.KRB_KDC));
-    krbProps.setRealm(get(krbConf, Property.KRB_REALM));
-    krbProps.setUser(get(krbConf, Property.USER));
-    krbProps.setPassword(get(krbConf, Property.PASSWORD));
+    SystemEnvironment systemEnvironment = new SystemEnvironment();
+    krbProps.setKdc(systemEnvironment.getVariable(SystemEnvironment.KRB_KDC));
+    krbProps.setRealm(systemEnvironment.getVariable(SystemEnvironment.KRB_REALM));
+    krbProps.setUser(systemEnvironment.getVariable(SystemEnvironment.KRB_USER));
+    krbProps.setPassword(systemEnvironment.getVariable(SystemEnvironment.KRB_PASSWORD));
     return krbProps;
-  }
-
-  private String get(ServiceInstanceConfiguration conf, Property property) {
-    return get(conf, property, "");
-  }
-
-  private String get(ServiceInstanceConfiguration conf, Property property, String defaultValue) {
-    return conf.getProperty(property).orElseGet(() -> {
-      logErrorMsg(property);
-      return defaultValue;
-    });
-  }
-
-  private void logErrorMsg(Property property) {
-    LOGGER.debug(getErrorMsg(property));
-  }
-
-  private String getErrorMsg(Property property) {
-    return property.name() + " not found in VCAP_SERVICES";
   }
 }

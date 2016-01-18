@@ -3,16 +3,20 @@ applications:
 - name: auth-gateway
   buildpack: java_buildpack
   path: target/auth-gateway-engine-${version}.jar
-  services:
-  - kerberos-service
-  - zookeeper-instance-bare
-  - hdfs-instance-bare
   env:
+    KRB_KDC: placeholder
+    KRB_REALM: placeholder
+    KRB_USER: placeholder
+    KRB_PASSWORD: placeholder
+    ZK_CLUSTER_URL: placeholder
+    HADOOP_PROVIDED_ZIP: placeholder
     HDFS_SUPERUSER: hdfs
     HDFS_KEYTAB: placeholder
     HGM_PRINCIPAL: placeholder
     HGM_PRINCIPAL_KEYTAB: placeholder
     HGM_URL: placeholder
+    HGM_USERNAME: placeholder
+    HGM_PASSWORD: placeholder
     SENTRY_KEYTAB: placeholder
     SENTRY_ADDRESS: placeholder
     SENTRY_PORT: placeholder

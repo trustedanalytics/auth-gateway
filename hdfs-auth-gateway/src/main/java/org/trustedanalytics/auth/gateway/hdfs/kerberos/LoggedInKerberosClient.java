@@ -13,26 +13,18 @@
  */
 package org.trustedanalytics.auth.gateway.hdfs.kerberos;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-
-import javax.security.auth.login.LoginException;
-
-import com.google.common.annotations.VisibleForTesting;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.security.authentication.util.KerberosName;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.trustedanalytics.auth.gateway.KeyTab;
-import org.trustedanalytics.hadoop.config.client.Configurations;
-import org.trustedanalytics.hadoop.config.client.ServiceType;
+import org.trustedanalytics.auth.gateway.SystemEnvironment;
 import org.trustedanalytics.hadoop.kerberos.KrbLoginManager;
 import org.trustedanalytics.hadoop.kerberos.KrbLoginManagerFactory;
 
+import org.apache.hadoop.conf.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sun.security.krb5.KrbException;
+
+import javax.security.auth.login.LoginException;
+import java.io.IOException;
 
 public class LoggedInKerberosClient {
 
@@ -41,8 +33,6 @@ public class LoggedInKerberosClient {
   private KerberosProperties kerberosProperties;
 
   private Configuration configuration;
-
-  private static final String KRB_PRINC_TO_SYS_USER_NAME_RULES = "hadoop.security.auth_to_local";
 
   public LoggedInKerberosClient(KerberosProperties kerberosProperties) throws IOException,
       LoginException, KrbException {
@@ -61,9 +51,8 @@ public class LoggedInKerberosClient {
     KrbLoginManager loginManager =
         KrbLoginManagerFactory.getInstance().getKrbLoginManagerInstance(
             kerberosProperties.getKdc(), kerberosProperties.getRealm());
-    configuration =
-        Configurations.newInstanceFromEnv().getServiceConfig(ServiceType.HDFS_TYPE)
-            .asHadoopConfiguration();
+    configuration = new SystemEnvironment().getHadoopConfiguration();
+
     loginManager.loginInHadoop(loginManager.loginWithKeyTab(
         kerberosProperties.getKeytabPrincipal(),
         KeyTab.createInstance(kerberosProperties.getKeytab(),

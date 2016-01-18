@@ -13,15 +13,10 @@
  */
 package org.trustedanalytics.auth.gateway;
 
-import com.google.common.annotations.VisibleForTesting;
-
-import org.apache.hadoop.security.authentication.util.KerberosName;
-import org.trustedanalytics.hadoop.config.client.AppConfiguration;
-import org.trustedanalytics.hadoop.config.client.Configurations;
-import org.trustedanalytics.hadoop.config.client.Property;
-import org.trustedanalytics.hadoop.config.client.ServiceInstanceConfiguration;
-import org.trustedanalytics.hadoop.config.client.ServiceType;
 import org.trustedanalytics.hadoop.kerberos.KrbLoginManagerFactory;
+
+import com.google.common.annotations.VisibleForTesting;
+import org.apache.hadoop.security.authentication.util.KerberosName;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -45,30 +40,26 @@ public final class KeyTab {
   private static final String NAME_REALM_SEPARATOR_STR  = "@";
 
   public static KeyTab createInstance(String keyTab, String userName) throws IOException {
-    return new KeyTab(keyTab, userName, Configurations.newInstanceFromEnv());
+    return new KeyTab(keyTab, userName, new SystemEnvironment());
   }
 
   @VisibleForTesting
-  static KeyTab createInstance(String keyTab, String userName, AppConfiguration configuration)
+  static KeyTab createInstance(String keyTab, String userName, SystemEnvironment systemEnvironment)
       throws IOException {
-    return new KeyTab(keyTab, userName, configuration);
+    return new KeyTab(keyTab, userName, systemEnvironment);
   }
 
   private KeyTab(String keytab,
                 String userName,
-                AppConfiguration configuration) throws IOException {
+                SystemEnvironment systemEnvironment) throws IOException {
 
-    ServiceInstanceConfiguration krbServiceConf =
-        configuration.getServiceConfig(KRB_CONF_SERVICE_NAME);
-    ServiceInstanceConfiguration hadoopConf =
-        configuration.getServiceConfig(ServiceType.HDFS_TYPE);
-    String realm = krbServiceConf.getProperty(Property.KRB_REALM).get();
-    String kdc = krbServiceConf.getProperty(Property.KRB_KDC).get();
+    String realm = systemEnvironment.getVariable(SystemEnvironment.KRB_REALM);
+    String kdc = systemEnvironment.getVariable(SystemEnvironment.KRB_KDC);
     KrbLoginManagerFactory.getInstance().getKrbLoginManagerInstance(kdc, realm);
 
     if (!KerberosName.hasRulesBeenSet()) {
-      KerberosName.setRules(hadoopConf.asHadoopConfiguration()
-                                      .get(KRB_PRINC_TO_SYS_USER_NAME_RULES));
+        KerberosName.setRules(systemEnvironment.getHadoopConfiguration()
+                                        .get(KRB_PRINC_TO_SYS_USER_NAME_RULES));
     }
     krbPrincName = new KerberosName(userName.concat(NAME_REALM_SEPARATOR_STR)
                                             .concat(realm));

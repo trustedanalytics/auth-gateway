@@ -13,7 +13,14 @@
  */
 package org.trustedanalytics.auth.gateway.hgm;
 
+import org.trustedanalytics.auth.gateway.hgm.entity.User;
+import org.trustedanalytics.auth.gateway.hgm.utils.ApiEndpoints;
+import org.trustedanalytics.auth.gateway.hgm.utils.Qualifiers;
+import org.trustedanalytics.auth.gateway.spi.Authorizable;
+import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
+
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +29,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import org.trustedanalytics.auth.gateway.hgm.entity.User;
-import org.trustedanalytics.auth.gateway.hgm.utils.ApiEndpoints;
-import org.trustedanalytics.auth.gateway.hgm.utils.Qualifiers;
-import org.trustedanalytics.auth.gateway.spi.Authorizable;
-import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
 
-import com.google.common.collect.ImmutableMap;
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @Profile({Qualifiers.HTTPS, Qualifiers.KERBEROS})
@@ -51,7 +54,7 @@ public class HgmGateway implements Authorizable {
     LOGGER.debug(String.format("Create organization %s", orgId));
     try {
       restTemplate.postForObject(createUrl(ApiEndpoints.USERS),
-          new User(orgId.concat(ADMIN_POSTFIX)), String.class, orgId);
+        new User(orgId.concat(ADMIN_POSTFIX)), String.class, orgId);
     } catch (RestClientException e) {
       throw new AuthorizableGatewayException(String.format("Can't add organization: %s", orgId), e);
     }
@@ -61,8 +64,16 @@ public class HgmGateway implements Authorizable {
   public void addUserToOrg(String userId, String orgId) throws AuthorizableGatewayException {
     LOGGER.debug(String.format("Adding user %s to group %s", userId, orgId));
     try {
-      restTemplate.postForObject(createUrl(ApiEndpoints.USERS), new User(userId), String.class,
+      List<String>
+        users =
+        Arrays
+          .asList(restTemplate.getForObject(createUrl(ApiEndpoints.USERS), String[].class, orgId));
+      if (!users.contains(userId)) {
+        restTemplate.postForObject(createUrl(ApiEndpoints.USERS), new User(userId), String.class,
           orgId);
+      } else {
+        LOGGER.warn(String.format("Trying to add existing user %s in group %s", userId, orgId));
+      }
     } catch (RestClientException e) {
       throw new AuthorizableGatewayException(String.format("Can't add user: %s", userId), e);
     }
@@ -75,7 +86,7 @@ public class HgmGateway implements Authorizable {
       restTemplate.delete(createUrl(ApiEndpoints.GROUP), orgId);
     } catch (RestClientException e) {
       throw new AuthorizableGatewayException(String.format("Can't remove organization: %s", orgId),
-          e);
+        e);
     }
   }
 
@@ -84,18 +95,20 @@ public class HgmGateway implements Authorizable {
     LOGGER.debug(String.format("Deleting user %s from group %s", userId, orgId));
     try {
       restTemplate.delete(createUrl(ApiEndpoints.USER),
-          ImmutableMap.of("user", userId, "group", orgId));
+        ImmutableMap.of("user", userId, "group", orgId));
     } catch (RestClientException e) {
       throw new AuthorizableGatewayException(String.format("Can't remove user: %s from org: %s",
-          userId, orgId), e);
+        userId, orgId), e);
     }
   }
 
   @Override
-  public void addUser(String userId) throws AuthorizableGatewayException {}
+  public void addUser(String userId) throws AuthorizableGatewayException {
+  }
 
   @Override
-  public void removeUser(String userId) throws AuthorizableGatewayException {}
+  public void removeUser(String userId) throws AuthorizableGatewayException {
+  }
 
   @Override
   public String getName() {
@@ -106,8 +119,7 @@ public class HgmGateway implements Authorizable {
     return groupMappingServiceUrl.concat(endpoint);
   }
 
-  @VisibleForTesting
-  void setGroupMappingServiceUrl(String url) {
+  @VisibleForTesting void setGroupMappingServiceUrl(String url) {
     groupMappingServiceUrl = url;
   }
 

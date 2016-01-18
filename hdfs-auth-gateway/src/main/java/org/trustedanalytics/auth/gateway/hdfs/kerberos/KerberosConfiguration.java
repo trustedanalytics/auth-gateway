@@ -13,24 +13,20 @@
  */
 package org.trustedanalytics.auth.gateway.hdfs.kerberos;
 
-import java.io.IOException;
+import org.trustedanalytics.auth.gateway.SystemEnvironment;
+import org.trustedanalytics.auth.gateway.hdfs.config.ExternalConfiguration;
+import org.trustedanalytics.auth.gateway.hdfs.utils.Qualifiers;
 
-import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.trustedanalytics.auth.gateway.hdfs.config.ExternalConfiguration;
-import org.trustedanalytics.auth.gateway.hdfs.utils.Qualifiers;
-import org.trustedanalytics.hadoop.config.client.Configurations;
-import org.trustedanalytics.hadoop.config.client.Property;
-import org.trustedanalytics.hadoop.config.client.ServiceInstanceConfiguration;
+
+import java.io.IOException;
 
 @Profile(Qualifiers.HDFS)
 @Configuration
 public class KerberosConfiguration {
-
-  public static final String KERBEROS_SERVICE = "kerberos-service";
 
   @Autowired
   private ExternalConfiguration externalConfiguration;
@@ -38,14 +34,12 @@ public class KerberosConfiguration {
   @Bean
   @Profile(Qualifiers.TEST_EXCLUDE)
   public KerberosProperties getKerberosProperties() throws IOException {
-    ServiceInstanceConfiguration krbConf =
-        Configurations.newInstanceFromEnv().getServiceConfig(KERBEROS_SERVICE);
-    String kdc = krbConf.getProperty(Property.KRB_KDC).get();
-    String realm = krbConf.getProperty(Property.KRB_REALM).get();
-    String technicalUser = krbConf.getProperty(Property.USER).get();
+    SystemEnvironment systemEnvironment = new SystemEnvironment();
+    String kdc = systemEnvironment.getVariable(SystemEnvironment.KRB_KDC);
+    String realm = systemEnvironment.getVariable(SystemEnvironment.KRB_REALM);
+    String technicalUser = systemEnvironment.getVariable(SystemEnvironment.KRB_USER);
     String principal = externalConfiguration.getSuperUser();
     String keytabFile = externalConfiguration.getKeytab();
-
     return new KerberosProperties(kdc, realm, technicalUser, principal, keytabFile);
   }
 }

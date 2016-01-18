@@ -21,13 +21,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.trustedanalytics.hadoop.config.client.AppConfiguration;
-import org.trustedanalytics.hadoop.config.client.Property;
-import org.trustedanalytics.hadoop.config.client.ServiceInstanceConfiguration;
-import org.trustedanalytics.hadoop.config.client.ServiceType;
 
 import java.io.File;
-import java.util.Optional;
+import java.io.IOException;
 
 import static org.mockito.Mockito.when;
 
@@ -35,27 +31,18 @@ import static org.mockito.Mockito.when;
 public class KeyTabTest {
 
   @Mock
-  AppConfiguration appConf;
-
-  @Mock
-  ServiceInstanceConfiguration hdfsConf;
-
-  @Mock
-  ServiceInstanceConfiguration krbConf;
+  SystemEnvironment systemEnvironment;
 
   private String expectedKeyTabPath = "/tmp/jojo.keytab";
 
   @Before
-  public void setUp() {
+  public void setUp() throws IOException {
     Configuration hadoopConf = new Configuration(false);
     hadoopConf.set(KeyTab.KRB_PRINC_TO_SYS_USER_NAME_RULES, "DEFAULT");
-    when(appConf.getServiceConfig(ServiceType.HDFS_TYPE)).thenReturn(hdfsConf);
-    when(appConf.getServiceConfig(KeyTab.KRB_CONF_SERVICE_NAME)).thenReturn(krbConf);
-    when(hdfsConf.asHadoopConfiguration()).thenReturn(hadoopConf);
-    when(krbConf.getProperty(Property.KRB_KDC)).thenReturn(Optional.of("localhost"));
-    when(krbConf.getProperty(Property.KRB_REALM)).thenReturn(Optional.of("JOJOREALM"));
+    when(systemEnvironment.getHadoopConfiguration()).thenReturn(hadoopConf);
+    when(systemEnvironment.getVariable("KRB_KDC")).thenReturn("localhost");
+    when(systemEnvironment.getVariable("KRB_REALM")).thenReturn("JOJOREALM");
   }
-
 
   @After
   public void tearDown() throws Exception {
@@ -66,7 +53,7 @@ public class KeyTabTest {
   public void testGetFullKeyTabFilePath_InitializedKeyTab_returnPathToCreatedKeyTab()
       throws Exception {
     //when
-    KeyTab toTest = KeyTab.createInstance("", "jojo/sys", appConf);
+    KeyTab toTest = KeyTab.createInstance("", "jojo/sys", systemEnvironment);
 
     //then
     String expectedKeyTabPath = "/tmp/jojo.keytab";
@@ -77,7 +64,7 @@ public class KeyTabTest {
   @Test(expected = IllegalArgumentException.class)
   public void testCreateInstance_incorrectBase64Scheme_throwsException() throws Exception {
     //when
-    KeyTab toTest = KeyTab.createInstance("=-a=-asda=-=-", "jojo/sys", appConf);
+    KeyTab toTest = KeyTab.createInstance("=-a=-asda=-=-", "jojo/sys", systemEnvironment);
 
     //then
     //throws exception

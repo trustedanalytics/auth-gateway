@@ -13,9 +13,12 @@
  */
 package org.trustedanalytics.auth.gateway.hgm;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -73,18 +76,22 @@ public class HgmGatewayTest {
   @Test
   public void addUserToOrg_hadoopGroupMappingServiceCalled_creationSuccess()
       throws AuthorizableGatewayException {
+    when(restTemplate.getForObject(
+      eq(HGM_TEST_URL.concat(ApiEndpoints.USERS)), eq(String[].class),  eq(ORG_ID)))
+      .thenReturn(new String []{});
     hgmGateway.addUserToOrg(USER_ID, ORG_ID);
     verify(restTemplate).postForObject(eq(HGM_TEST_URL.concat(ApiEndpoints.USERS)),
         eq(new User(USER_ID)), eq(String.class), eq(ORG_ID));
   }
 
-  @Test(expected = AuthorizableGatewayException.class)
+  @Test
   public void addUserToOrg_hadoopGroupMappingServiceCalled_alreadyExsits()
       throws AuthorizableGatewayException {
-    doThrow(new RestClientException("409")).when(restTemplate).postForObject(
-        eq(HGM_TEST_URL.concat(ApiEndpoints.USERS)), eq(new User(USER_ID)), eq(String.class),
-        eq(ORG_ID));
+    when(restTemplate.getForObject(
+      eq(HGM_TEST_URL.concat(ApiEndpoints.USERS)), eq(String[].class),  eq(ORG_ID)))
+      .thenReturn(new String []{USER_ID});
     hgmGateway.addUserToOrg(USER_ID, ORG_ID);
+    verify(restTemplate, never()).postForObject(any(), any(), any());
   }
 
   @Test

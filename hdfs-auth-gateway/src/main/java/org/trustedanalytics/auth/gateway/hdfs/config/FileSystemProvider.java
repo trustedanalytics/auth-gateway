@@ -13,12 +13,12 @@
  */
 package org.trustedanalytics.auth.gateway.hdfs.config;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import org.trustedanalytics.auth.gateway.SystemEnvironment;
+import org.trustedanalytics.auth.gateway.hdfs.kerberos.KerberosProperties;
+import org.trustedanalytics.auth.gateway.hdfs.kerberos.LoggedInKerberosClient;
+import org.trustedanalytics.auth.gateway.hdfs.utils.Qualifiers;
 
-import javax.security.auth.login.LoginException;
-
+import com.google.common.base.Throwables;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.slf4j.Logger;
@@ -26,16 +26,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
-import org.trustedanalytics.auth.gateway.hdfs.kerberos.KerberosProperties;
-import org.trustedanalytics.auth.gateway.hdfs.kerberos.LoggedInKerberosClient;
-import org.trustedanalytics.auth.gateway.hdfs.utils.Qualifiers;
-import org.trustedanalytics.hadoop.config.client.AppConfiguration;
-import org.trustedanalytics.hadoop.config.client.Configurations;
-import org.trustedanalytics.hadoop.config.client.ServiceType;
-
 import sun.security.krb5.KrbException;
 
-import com.google.common.base.Throwables;
+import javax.security.auth.login.LoginException;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 @Profile(Qualifiers.HDFS)
 @org.springframework.context.annotation.Configuration
@@ -92,7 +88,6 @@ public class FileSystemProvider {
   @Bean
   @Profile(Qualifiers.TEST_EXCLUDE)
   public Configuration getConfiguration() throws IOException {
-    AppConfiguration configurationHelper = Configurations.newInstanceFromEnv();
-    return configurationHelper.getServiceConfig(ServiceType.HDFS_TYPE).asHadoopConfiguration();
+    return new SystemEnvironment().getHadoopConfiguration();
   }
 }
