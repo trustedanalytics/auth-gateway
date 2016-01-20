@@ -14,8 +14,12 @@
 package org.trustedanalytics.auth.gateway.hdfs;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.AclEntry;
 import org.apache.hadoop.fs.permission.AclEntryType;
@@ -23,6 +27,8 @@ import org.apache.hadoop.fs.permission.FsAction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+
+import org.trustedanalytics.auth.gateway.hdfs.config.ExternalConfiguration;
 import org.trustedanalytics.auth.gateway.hdfs.kerberos.KerberosProperties;
 import org.trustedanalytics.auth.gateway.hdfs.utils.PathCreator;
 import org.trustedanalytics.auth.gateway.hdfs.utils.Qualifiers;
@@ -39,6 +45,9 @@ public class HdfsGateway implements Authorizable {
 
   @Autowired
   private KerberosProperties kerberosProperties;
+
+  @Autowired
+  private ExternalConfiguration externalConfiguration;
 
   @Autowired
   private PathCreator pathCreator;
@@ -64,14 +73,20 @@ public class HdfsGateway implements Authorizable {
       hdfsClient.createDirectory(pathCreator.createBrokerUserspacePath(orgId), orgId.concat(ADMIN_POSTFIX), orgId,
           HdfsPermission.USER_ALL_GROUP_EXECUTE.getPermission());
 
-      List<AclEntry> acl_execute = hdfsClient.getAcl(kerberosProperties.getTechnicalPrincipal(), FsAction.EXECUTE,
+      List<AclEntry> acl_techExecute_hiveExecute = hdfsClient.getAcl(
+          kerberosProperties.getTechnicalPrincipal(), FsAction.EXECUTE,
+          externalConfiguration.getHiveUser(), FsAction.EXECUTE,
           AclEntryType.USER);
-      List<AclEntry> acl_user = hdfsClient.getAcl(kerberosProperties.getTechnicalPrincipal(), FsAction.ALL,
+      List<AclEntry> acl_techAll_hiveExecute = hdfsClient.getAcl(
+          kerberosProperties.getTechnicalPrincipal(), FsAction.ALL,
+          externalConfiguration.getHiveUser(), FsAction.EXECUTE,
           AclEntryType.USER);
-      hdfsClient.setACLForDirectory(pathCreator.createOrgPath(orgId), acl_execute);
-      hdfsClient.setACLForDirectory(pathCreator.createOrgBrokerPath(orgId), acl_execute);
-      hdfsClient.setACLForDirectory(pathCreator.createBrokerMetadataPath(orgId), acl_user);
-      hdfsClient.setACLForDirectory(pathCreator.createBrokerUserspacePath(orgId), acl_user);
+      List<AclEntry> acl_tech_all = hdfsClient.getAcl(
+          kerberosProperties.getTechnicalPrincipal(), FsAction.ALL, AclEntryType.USER);
+      hdfsClient.setACLForDirectory(pathCreator.createOrgPath(orgId), acl_techExecute_hiveExecute);
+      hdfsClient.setACLForDirectory(pathCreator.createOrgBrokerPath(orgId), acl_techExecute_hiveExecute);
+      hdfsClient.setACLForDirectory(pathCreator.createBrokerUserspacePath(orgId), acl_techAll_hiveExecute);
+      hdfsClient.setACLForDirectory(pathCreator.createBrokerMetadataPath(orgId), acl_tech_all);
     } catch (IOException e) {
       throw new AuthorizableGatewayException(String.format("Can't add organization: %s", orgId), e);
     }

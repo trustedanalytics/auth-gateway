@@ -14,11 +14,9 @@
 package org.trustedanalytics.auth.gateway.hdfs;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.configuration.SystemConfiguration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
@@ -71,23 +69,35 @@ public class HdfsClient {
 
   public List<AclEntry> getAcl(String user, FsAction action, AclEntryType aclEntryType) {
     return Arrays.asList(
-        new AclEntry.Builder()
-            .setName(user)
-            .setScope(AclEntryScope.ACCESS)
-            .setPermission(action)
-            .setType(aclEntryType)
-            .build(),
-        new AclEntry.Builder()
-            .setScope(AclEntryScope.ACCESS)
-            .setPermission(action)
-            .setType(AclEntryType.GROUP)
-            .build(),
-        new AclEntry.Builder()
-            .setScope(AclEntryScope.ACCESS)
-            .setPermission(action)
-            .setType(AclEntryType.MASK)
-            .build()
+        getAclUserEntry(user, action, aclEntryType),
+        getAclEntry(action, AclEntryType.GROUP),
+        getAclEntry(action, AclEntryType.MASK)
         );
   }
 
+  public List<AclEntry> getAcl(String user, FsAction action, String user2, FsAction action2, AclEntryType aclEntryType) {
+    return Arrays.asList(
+        getAclUserEntry(user, action, aclEntryType),
+        getAclUserEntry(user2, action2, aclEntryType),
+        getAclEntry(action.or(action2), AclEntryType.GROUP),
+        getAclEntry(action.or(action2), AclEntryType.MASK)
+    );
+  }
+
+  private AclEntry getAclUserEntry(String user, FsAction action, AclEntryType aclEntryType) {
+    return new AclEntry.Builder()
+        .setName(user)
+        .setScope(AclEntryScope.ACCESS)
+        .setPermission(action)
+        .setType(aclEntryType)
+        .build();
+  }
+
+  private AclEntry getAclEntry(FsAction action, AclEntryType group) {
+    return new AclEntry.Builder()
+        .setScope(AclEntryScope.ACCESS)
+        .setPermission(action)
+        .setType(group)
+        .build();
+  }
 }

@@ -31,6 +31,8 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import org.trustedanalytics.auth.gateway.hdfs.config.ExternalConfiguration;
 import org.trustedanalytics.auth.gateway.hdfs.kerberos.KerberosProperties;
 import org.trustedanalytics.auth.gateway.hdfs.utils.PathCreator;
 import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
@@ -67,6 +69,9 @@ public class HdfsGatewayTest {
   @Mock
   private KerberosProperties kerberosProperties;
 
+  @Mock
+  private ExternalConfiguration externalConfiguration;
+
   @InjectMocks
   private HdfsGateway hdfsGateway;
 
@@ -86,7 +91,7 @@ public class HdfsGatewayTest {
     groupPermission = new FsPermission(FsAction.ALL, FsAction.ALL, FsAction.NONE);
     groupExecPermission = new FsPermission(FsAction.ALL, FsAction.EXECUTE, FsAction.NONE);
     groupAcl = hdfsClient.getAcl("test_org", FsAction.EXECUTE, AclEntryType.GROUP);
-    userAcl = hdfsClient.getAcl("test_cf", FsAction.ALL, AclEntryType.USER);
+    userAcl = hdfsClient.getAcl("test_cf", FsAction.ALL, "test_hive", FsAction.EXECUTE, AclEntryType.USER);
     when(pathCreator.createOrgPath("test_org")).thenReturn(ORG_PATH);
     when(pathCreator.createOrgBrokerPath("test_org")).thenReturn(BROKER_PATH);
     when(pathCreator.createBrokerUserspacePath("test_org")).thenReturn(BROKER_USERSPACE_PATH);
@@ -96,6 +101,7 @@ public class HdfsGatewayTest {
     when(pathCreator.createOrgUsersPath("test_org")).thenReturn(ORG_USERS_PATH);
     when(pathCreator.createUserPath("test_org", "test_user")).thenReturn(USER_PATH);
     when(kerberosProperties.getTechnicalPrincipal()).thenReturn("test_cf");
+    when(externalConfiguration.getHiveUser()).thenReturn("test_hive");
   }
 
   @Test

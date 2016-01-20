@@ -31,12 +31,20 @@ public class ExternalConfiguration {
   @NotNull
   public String superUser;
 
+  @Value("${hdfs.hiveUser}")
+  @NotNull
+  public String hiveUser;
+
   public String getKeytab() {
     return keytab;
   }
 
   public String getSuperUser() {
     return superUser;
+  }
+
+  public String getHiveUser() {
+    return hiveUser;
   }
 
 }

@@ -13,12 +13,17 @@
  */
 package org.trustedanalytics.auth.gateway.hdfs.integration;
 
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 
 import java.io.IOException;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 
+import com.google.common.collect.ImmutableList;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.*;
@@ -99,10 +104,10 @@ public class HdfsGatewayIntegrationTest {
     checkIfDirectoryExistsWithPermissions(TEST_ORG_METADATA_PATH, "intel_admin", aclUserPermission);
     checkIfDirectoryExistsWithPermissions(TEST_ORG_USERSPACE_PATH, "intel_admin", aclUserPermission);
 
-    checkIfDirectoryExistsWithACL(TEST_ORG_PATH, "intel_admin", "test_cf");
-    checkIfDirectoryExistsWithACL(TEST_ORG_BROKER_PATH, "intel_admin", "test_cf");
-    checkIfDirectoryExistsWithACL(TEST_ORG_METADATA_PATH, "intel_admin", "test_cf");
-    checkIfDirectoryExistsWithACL(TEST_ORG_USERSPACE_PATH, "intel_admin", "test_cf");
+    checkIfDirectoryExistsWithACL(TEST_ORG_PATH, "intel_admin", new String []{"test_cf", "hive"});
+    checkIfDirectoryExistsWithACL(TEST_ORG_BROKER_PATH, "intel_admin", new String []{"test_cf", "hive"});
+    checkIfDirectoryExistsWithACL(TEST_ORG_METADATA_PATH, "intel_admin", new String []{"test_cf"});
+    checkIfDirectoryExistsWithACL(TEST_ORG_USERSPACE_PATH, "intel_admin", new String []{"test_cf", "hive"});
   }
 
   @Test
@@ -170,17 +175,20 @@ public class HdfsGatewayIntegrationTest {
     assertThat(fileSystem.getFileStatus(path).getPermission(), equalTo(permission));
   }
 
-  private void checkIfDirectoryExistsWithACL(Path path, String owner, String privilegedUser)
+  private void checkIfDirectoryExistsWithACL(Path path, String owner, String[] privilegedUsers)
       throws IOException {
     AclStatus s = fileSystem.getAclStatus(path);
 
     assertThat(fileSystem.exists(path), equalTo(true));
     assertThat(s.getOwner(), equalTo(owner));
 
-    Optional<AclEntry> first =
-        s.getEntries().stream().filter((entry) -> (entry.getType().equals(AclEntryType.USER)))
-            .findFirst();
-    assertThat(first.isPresent(), equalTo(true));
-    assertThat(first.get().getName(), equalTo(privilegedUser));
+    List<String> usersWithAcl =
+        s.getEntries().stream()
+            .filter(entry -> entry.getType().equals(AclEntryType.USER))
+            .map(AclEntry::getName)
+            .collect(toList());
+
+    assertThat(usersWithAcl.size(), equalTo(privilegedUsers.length));
+    assertThat(usersWithAcl, containsInAnyOrder(privilegedUsers));
   }
 }

@@ -3,6 +3,7 @@ engine:
 hdfs:
   superUser: ${hdfs.superuser:}
   clientKeytab: ${hdfs.keytab:}
+  hiveUser: ${hdfs.hiveuser:}
 group.mapping:
   url: ${hgm.url}
   kerberos:

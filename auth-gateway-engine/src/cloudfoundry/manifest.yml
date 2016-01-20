@@ -12,6 +12,7 @@ applications:
     HADOOP_PROVIDED_ZIP: placeholder
     HDFS_SUPERUSER: hdfs
     HDFS_KEYTAB: placeholder
+    HDFS_HIVEUSER: hive
     HGM_PRINCIPAL: placeholder
     HGM_PRINCIPAL_KEYTAB: placeholder
     HGM_URL: placeholder
