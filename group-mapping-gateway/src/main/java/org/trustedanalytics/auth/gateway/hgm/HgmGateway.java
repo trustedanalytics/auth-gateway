@@ -53,8 +53,10 @@ public class HgmGateway implements Authorizable {
   public void addOrganization(String orgId) throws AuthorizableGatewayException {
     LOGGER.debug(String.format("Create organization %s", orgId));
     try {
-      restTemplate.postForObject(createUrl(ApiEndpoints.USERS),
-        new User(orgId.concat(ADMIN_POSTFIX)), String.class, orgId);
+      if (!getGroups().contains(orgId)) {
+        restTemplate.postForObject(createUrl(ApiEndpoints.USERS),
+            new User(orgId.concat(ADMIN_POSTFIX)), String.class, orgId);
+      }
     } catch (RestClientException e) {
       throw new AuthorizableGatewayException(String.format("Can't add organization: %s", orgId), e);
     }
@@ -64,11 +66,7 @@ public class HgmGateway implements Authorizable {
   public void addUserToOrg(String userId, String orgId) throws AuthorizableGatewayException {
     LOGGER.debug(String.format("Adding user %s to group %s", userId, orgId));
     try {
-      List<String>
-        users =
-        Arrays
-          .asList(restTemplate.getForObject(createUrl(ApiEndpoints.USERS), String[].class, orgId));
-      if (!users.contains(userId)) {
+      if (!getUsersFromGroup(orgId).contains(userId)) {
         restTemplate.postForObject(createUrl(ApiEndpoints.USERS), new User(userId), String.class,
           orgId);
       } else {
@@ -83,7 +81,9 @@ public class HgmGateway implements Authorizable {
   public void removeOrganization(String orgId) throws AuthorizableGatewayException {
     LOGGER.debug(String.format("Deleting group %s", orgId));
     try {
-      restTemplate.delete(createUrl(ApiEndpoints.GROUP), orgId);
+      if (getGroups().contains(orgId)) {
+        restTemplate.delete(createUrl(ApiEndpoints.GROUP), orgId);
+      }
     } catch (RestClientException e) {
       throw new AuthorizableGatewayException(String.format("Can't remove organization: %s", orgId),
         e);
@@ -94,8 +94,10 @@ public class HgmGateway implements Authorizable {
   public void removeUserFromOrg(String userId, String orgId) throws AuthorizableGatewayException {
     LOGGER.debug(String.format("Deleting user %s from group %s", userId, orgId));
     try {
-      restTemplate.delete(createUrl(ApiEndpoints.USER),
-        ImmutableMap.of("user", userId, "group", orgId));
+      if (getUsersFromGroup(orgId).contains(userId)) {
+        restTemplate.delete(createUrl(ApiEndpoints.USER),
+            ImmutableMap.of("user", userId, "group", orgId));
+      }
     } catch (RestClientException e) {
       throw new AuthorizableGatewayException(String.format("Can't remove user: %s from org: %s",
         userId, orgId), e);
@@ -117,6 +119,14 @@ public class HgmGateway implements Authorizable {
 
   private String createUrl(String endpoint) {
     return groupMappingServiceUrl.concat(endpoint);
+  }
+
+  private List<String> getUsersFromGroup(String orgId) throws RestClientException {
+    return Arrays.asList(restTemplate.getForObject(createUrl(ApiEndpoints.USERS), String[].class, orgId));
+  }
+
+  private List<String> getGroups() throws AuthorizableGatewayException {
+    return Arrays.asList(restTemplate.getForObject(createUrl(ApiEndpoints.GROUPS), String[].class));
   }
 
   @VisibleForTesting void setGroupMappingServiceUrl(String url) {

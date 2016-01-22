@@ -59,17 +59,20 @@ public class HgmGatewayTest {
   @Test
   public void addOrganization_hadoopGroupMappingServiceCalled_creationSuccess()
       throws AuthorizableGatewayException {
+    when(restTemplate.getForObject(
+        eq(HGM_TEST_URL.concat(ApiEndpoints.GROUPS)), eq(String[].class)))
+        .thenReturn(new String []{});
     hgmGateway.addOrganization(ORG_ID);
     verify(restTemplate).postForObject(eq(HGM_TEST_URL.concat(ApiEndpoints.USERS)),
         eq(new User(ORG_ADMIN)), eq(String.class), eq(ORG_ID));
   }
 
-  @Test(expected = AuthorizableGatewayException.class)
+  @Test
   public void addOrganization_hadoopGroupMappingServiceCalled_alreadyExsits()
       throws AuthorizableGatewayException {
-    doThrow(new RestClientException("409")).when(restTemplate).postForObject(
-        eq(HGM_TEST_URL.concat(ApiEndpoints.USERS)), eq(new User(ORG_ADMIN)), eq(String.class),
-        eq(ORG_ID));
+    when(restTemplate.getForObject(
+      eq(HGM_TEST_URL.concat(ApiEndpoints.GROUPS)), eq(String[].class)))
+      .thenReturn(new String []{ORG_ID});
     hgmGateway.addOrganization(ORG_ID);
   }
 
@@ -97,32 +100,39 @@ public class HgmGatewayTest {
   @Test
   public void removeUserFromOrg_hadoopGroupMappingServiceCalled_deletionSuccess()
       throws AuthorizableGatewayException {
+    when(restTemplate.getForObject(
+        eq(HGM_TEST_URL.concat(ApiEndpoints.USERS)), eq(String[].class),  eq(ORG_ID)))
+        .thenReturn(new String []{USER_ID});
     hgmGateway.removeUserFromOrg(USER_ID, ORG_ID);
     verify(restTemplate).delete(eq(HGM_TEST_URL.concat(ApiEndpoints.USER)),
         eq(ImmutableMap.of("user", USER_ID, "group", ORG_ID)));
   }
 
-  @Test(expected = AuthorizableGatewayException.class)
+  @Test
   public void removeUserFromOrg_hadoopGroupMappingServiceCalled_userNotExsits()
       throws AuthorizableGatewayException {
-    doThrow(new RestClientException("404")).when(restTemplate).delete(
-        eq(HGM_TEST_URL.concat(ApiEndpoints.USER)),
-        eq(ImmutableMap.of("user", USER_ID, "group", ORG_ID)));
+    when(restTemplate.getForObject(
+        eq(HGM_TEST_URL.concat(ApiEndpoints.USERS)), eq(String[].class),  eq(ORG_ID)))
+        .thenReturn(new String []{});
     hgmGateway.removeUserFromOrg(USER_ID, ORG_ID);
   }
 
   @Test
   public void removeOrganization_hadoopGroupMappingServiceCalled_deletionSuccess()
       throws AuthorizableGatewayException {
+    when(restTemplate.getForObject(
+        eq(HGM_TEST_URL.concat(ApiEndpoints.GROUPS)), eq(String[].class)))
+        .thenReturn(new String []{ORG_ID});
     hgmGateway.removeOrganization(ORG_ID);
     verify(restTemplate).delete(eq(HGM_TEST_URL.concat(ApiEndpoints.GROUP)), eq(ORG_ID));
   }
 
-  @Test(expected = AuthorizableGatewayException.class)
+  @Test
   public void removeOrganization_hadoopGroupMappingServiceCalled_organizationNotExists()
       throws AuthorizableGatewayException {
-    doThrow(new RestClientException("404")).when(restTemplate).delete(
-        eq(HGM_TEST_URL.concat(ApiEndpoints.GROUP)), eq(ORG_ID));
+    when(restTemplate.getForObject(
+        eq(HGM_TEST_URL.concat(ApiEndpoints.GROUPS)), eq(String[].class)))
+        .thenReturn(new String []{ORG_ID});
     hgmGateway.removeOrganization(ORG_ID);
   }
 
