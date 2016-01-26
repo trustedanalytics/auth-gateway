@@ -5,7 +5,7 @@
     <parent>
         <artifactId>auth-gateway</artifactId>
         <groupId>org.trustedanalytics</groupId>
-        <version>0.5.2</version>
+        <version>0.5.3</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -33,11 +33,7 @@
             <groupId>org.apache.curator</groupId>
             <artifactId>curator-test</artifactId>
             <version>2.8.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.curator</groupId>
-            <artifactId>curator-recipes</artifactId>
-            <version>2.8.0</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.trustedanalytics</groupId>
