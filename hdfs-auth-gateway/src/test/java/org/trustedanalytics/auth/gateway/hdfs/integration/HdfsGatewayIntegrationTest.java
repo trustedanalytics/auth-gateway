@@ -19,11 +19,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 
 import java.io.IOException;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
-import com.google.common.collect.ImmutableList;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.*;
@@ -104,10 +101,10 @@ public class HdfsGatewayIntegrationTest {
     checkIfDirectoryExistsWithPermissions(TEST_ORG_METADATA_PATH, "intel_admin", aclUserPermission);
     checkIfDirectoryExistsWithPermissions(TEST_ORG_USERSPACE_PATH, "intel_admin", aclUserPermission);
 
-    checkIfDirectoryExistsWithACL(TEST_ORG_PATH, "intel_admin", new String []{"test_cf", "hive"});
-    checkIfDirectoryExistsWithACL(TEST_ORG_BROKER_PATH, "intel_admin", new String []{"test_cf", "hive"});
+    checkIfDirectoryExistsWithACL(TEST_ORG_PATH, "intel_admin", new String []{"test_cf", "hive", "vcap"});
+    checkIfDirectoryExistsWithACL(TEST_ORG_BROKER_PATH, "intel_admin", new String []{"test_cf", "hive", "vcap"});
     checkIfDirectoryExistsWithACL(TEST_ORG_METADATA_PATH, "intel_admin", new String []{"test_cf"});
-    checkIfDirectoryExistsWithACL(TEST_ORG_USERSPACE_PATH, "intel_admin", new String []{"test_cf", "hive"});
+    checkIfDirectoryExistsWithACL(TEST_ORG_USERSPACE_PATH, "intel_admin", new String []{"test_cf", "hive", "vcap"});
   }
 
   @Test

@@ -14,13 +14,9 @@
 package org.trustedanalytics.auth.gateway.hdfs;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.AclEntry;
 import org.apache.hadoop.fs.permission.AclEntryType;
 import org.apache.hadoop.fs.permission.FsAction;
@@ -73,20 +69,24 @@ public class HdfsGateway implements Authorizable {
       hdfsClient.createDirectory(pathCreator.createBrokerUserspacePath(orgId), orgId.concat(ADMIN_POSTFIX), orgId,
           HdfsPermission.USER_ALL_GROUP_EXECUTE.getPermission());
 
-      List<AclEntry> acl_techExecute_hiveExecute = hdfsClient.getAcl(
-          kerberosProperties.getTechnicalPrincipal(), FsAction.EXECUTE,
-          externalConfiguration.getHiveUser(), FsAction.EXECUTE,
-          AclEntryType.USER);
-      List<AclEntry> acl_techAll_hiveExecute = hdfsClient.getAcl(
-          kerberosProperties.getTechnicalPrincipal(), FsAction.ALL,
-          externalConfiguration.getHiveUser(), FsAction.EXECUTE,
-          AclEntryType.USER);
-      List<AclEntry> acl_tech_all = hdfsClient.getAcl(
-          kerberosProperties.getTechnicalPrincipal(), FsAction.ALL, AclEntryType.USER);
-      hdfsClient.setACLForDirectory(pathCreator.createOrgPath(orgId), acl_techExecute_hiveExecute);
-      hdfsClient.setACLForDirectory(pathCreator.createOrgBrokerPath(orgId), acl_techExecute_hiveExecute);
-      hdfsClient.setACLForDirectory(pathCreator.createBrokerUserspacePath(orgId), acl_techAll_hiveExecute);
-      hdfsClient.setACLForDirectory(pathCreator.createBrokerMetadataPath(orgId), acl_tech_all);
+      HdfsUserPermission techX =
+          new HdfsUserPermission(kerberosProperties.getTechnicalPrincipal(), FsAction.EXECUTE, AclEntryType.USER);
+      HdfsUserPermission techRWX =
+          new HdfsUserPermission(kerberosProperties.getTechnicalPrincipal(), FsAction.ALL, AclEntryType.USER);
+      HdfsUserPermission hiveX =
+          new HdfsUserPermission(externalConfiguration.getHiveUser(), FsAction.EXECUTE, AclEntryType.USER);
+      HdfsUserPermission vcapX =
+          //TODO: should vcap be read from env or we can leave it (vcap is here only temporarily...)
+          new HdfsUserPermission("vcap", FsAction.EXECUTE, AclEntryType.USER);
+
+      List<AclEntry> acl_techX_hiveX_vcapX = hdfsClient.getAcl(ImmutableList.of(techX, hiveX, vcapX), FsAction.EXECUTE);
+      List<AclEntry> acl_techRWX_hiveX_vcapX = hdfsClient.getAcl(ImmutableList.of(techRWX, hiveX, vcapX), FsAction.ALL);
+      List<AclEntry> acl_techRWX = hdfsClient.getAcl(ImmutableList.of(techRWX), FsAction.ALL);
+
+      hdfsClient.setACLForDirectory(pathCreator.createOrgPath(orgId), acl_techX_hiveX_vcapX);
+      hdfsClient.setACLForDirectory(pathCreator.createOrgBrokerPath(orgId), acl_techX_hiveX_vcapX);
+      hdfsClient.setACLForDirectory(pathCreator.createBrokerUserspacePath(orgId), acl_techRWX_hiveX_vcapX);
+      hdfsClient.setACLForDirectory(pathCreator.createBrokerMetadataPath(orgId), acl_techRWX);
     } catch (IOException e) {
       throw new AuthorizableGatewayException(String.format("Can't add organization: %s", orgId), e);
     }

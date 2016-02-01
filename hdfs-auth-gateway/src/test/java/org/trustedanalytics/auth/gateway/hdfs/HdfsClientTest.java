@@ -13,6 +13,7 @@
  */
 package org.trustedanalytics.auth.gateway.hdfs;
 
+import com.google.common.collect.ImmutableList;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.*;
@@ -107,11 +108,25 @@ public class HdfsClientTest {
 
   @Test
   public void getAcl_getAclCalled_aclEntryCreated() throws IOException {
-    List<AclEntry> userAcl = hdfsClient.getAcl("test_user", FsAction.ALL, AclEntryType.USER);
-    assertThat(userAcl.get(0).getPermission(), equalTo(FsAction.ALL));
-    assertThat(userAcl.get(0).getType(), equalTo(AclEntryType.USER));;
-    assertThat(userAcl.get(0).getName(), equalTo("test_user"));
+    List<AclEntry> userAcl = hdfsClient.getAcl(
+        ImmutableList.of(
+            new HdfsUserPermission("test_user", FsAction.ALL, AclEntryType.USER),
+            new HdfsUserPermission("test_user2", FsAction.READ_EXECUTE, AclEntryType.USER)),
+        FsAction.ALL);
+
+    assertUserAcl(userAcl.get(0), "test_user", FsAction.ALL, AclEntryType.USER);
+    assertUserAcl(userAcl.get(1), "test_user2", FsAction.READ_EXECUTE, AclEntryType.USER);
+    assertUserAcl(userAcl.get(2), FsAction.ALL, AclEntryType.GROUP);
+    assertUserAcl(userAcl.get(3), FsAction.ALL, AclEntryType.MASK);
   }
 
+  private void assertUserAcl(AclEntry aclEntry, String name, FsAction fsAction, AclEntryType entryType) {
+    assertUserAcl(aclEntry, fsAction, entryType);
+    assertThat(aclEntry.getName(), equalTo(name));
+  }
 
+  private void assertUserAcl(AclEntry aclEntry, FsAction fsAction, AclEntryType entryType) {
+    assertThat(aclEntry.getPermission(), equalTo(fsAction));
+    assertThat(aclEntry.getType(), equalTo(entryType));
+  }
 }

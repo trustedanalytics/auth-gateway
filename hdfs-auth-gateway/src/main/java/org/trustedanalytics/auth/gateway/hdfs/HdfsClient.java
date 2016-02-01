@@ -14,7 +14,6 @@
 package org.trustedanalytics.auth.gateway.hdfs;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.hadoop.fs.FileSystem;
@@ -31,6 +30,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.trustedanalytics.auth.gateway.hdfs.config.FileSystemProvider;
 import org.trustedanalytics.auth.gateway.hdfs.utils.Qualifiers;
+
+import static java.util.stream.Collectors.toList;
 
 @Profile(Qualifiers.HDFS)
 @Configuration
@@ -67,21 +68,14 @@ public class HdfsClient {
     fileSystem.modifyAclEntries(path, aclEntries);
   }
 
-  public List<AclEntry> getAcl(String user, FsAction action, AclEntryType aclEntryType) {
-    return Arrays.asList(
-        getAclUserEntry(user, action, aclEntryType),
-        getAclEntry(action, AclEntryType.GROUP),
-        getAclEntry(action, AclEntryType.MASK)
-        );
-  }
-
-  public List<AclEntry> getAcl(String user, FsAction action, String user2, FsAction action2, AclEntryType aclEntryType) {
-    return Arrays.asList(
-        getAclUserEntry(user, action, aclEntryType),
-        getAclUserEntry(user2, action2, aclEntryType),
-        getAclEntry(action.or(action2), AclEntryType.GROUP),
-        getAclEntry(action.or(action2), AclEntryType.MASK)
-    );
+  //TODO: below method should be moved somewhere (ACLFactory?) or maybe even refactored to builder pattern
+  public List<AclEntry> getAcl(List<HdfsUserPermission> acls, FsAction groupAndMaskAction) {
+    List<AclEntry> aclList = acls.stream()
+        .map(hup -> getAclUserEntry(hup.getUser(), hup.getAction(), hup.getAclEntryType()))
+        .collect(toList());
+    aclList.add(getAclEntry(groupAndMaskAction, AclEntryType.GROUP));
+    aclList.add(getAclEntry(groupAndMaskAction, AclEntryType.MASK));
+    return aclList;
   }
 
   private AclEntry getAclUserEntry(String user, FsAction action, AclEntryType aclEntryType) {
