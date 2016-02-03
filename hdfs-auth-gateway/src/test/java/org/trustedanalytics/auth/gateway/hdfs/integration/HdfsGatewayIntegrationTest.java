@@ -101,10 +101,10 @@ public class HdfsGatewayIntegrationTest {
     checkIfDirectoryExistsWithPermissions(TEST_ORG_METADATA_PATH, "intel_admin", aclUserPermission);
     checkIfDirectoryExistsWithPermissions(TEST_ORG_USERSPACE_PATH, "intel_admin", aclUserPermission);
 
-    checkIfDirectoryExistsWithACL(TEST_ORG_PATH, "intel_admin", new String []{"test_cf", "hive", "vcap"});
-    checkIfDirectoryExistsWithACL(TEST_ORG_BROKER_PATH, "intel_admin", new String []{"test_cf", "hive", "vcap"});
+    checkIfDirectoryExistsWithACL(TEST_ORG_PATH, "intel_admin", new String []{"test_cf", "hive", "vcap", "test-arcadia"});
+    checkIfDirectoryExistsWithACL(TEST_ORG_BROKER_PATH, "intel_admin", new String []{"test_cf", "hive", "vcap", "test-arcadia"});
     checkIfDirectoryExistsWithACL(TEST_ORG_METADATA_PATH, "intel_admin", new String []{"test_cf"});
-    checkIfDirectoryExistsWithACL(TEST_ORG_USERSPACE_PATH, "intel_admin", new String []{"test_cf", "hive", "vcap"});
+    checkIfDirectoryExistsWithACL(TEST_ORG_USERSPACE_PATH, "intel_admin", new String []{"test_cf", "hive", "vcap", "test-arcadia"});
   }
 
   @Test

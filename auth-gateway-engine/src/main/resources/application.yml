@@ -4,6 +4,7 @@ hdfs:
   superUser: ${hdfs.superuser:}
   clientKeytab: ${hdfs.keytab:}
   hiveUser: ${hdfs.hiveuser:}
+  arcadiaUser: ${hdfs.arcadiauser:arcadia-user}
 group.mapping:
   url: ${hgm.url}
   kerberos:

@@ -35,6 +35,10 @@ public class ExternalConfiguration {
   @NotNull
   public String hiveUser;
 
+  @Value("${hdfs.arcadiaUser}")
+  @NotNull
+  private String arcadiaUser;
+
   public String getKeytab() {
     return keytab;
   }
@@ -47,4 +51,7 @@ public class ExternalConfiguration {
     return hiveUser;
   }
 
+  public String getArcadiaUser() {
+    return arcadiaUser;
+  }
 }

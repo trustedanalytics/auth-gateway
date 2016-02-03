@@ -75,17 +75,21 @@ public class HdfsGateway implements Authorizable {
           new HdfsUserPermission(kerberosProperties.getTechnicalPrincipal(), FsAction.ALL, AclEntryType.USER);
       HdfsUserPermission hiveX =
           new HdfsUserPermission(externalConfiguration.getHiveUser(), FsAction.EXECUTE, AclEntryType.USER);
+      HdfsUserPermission arcadiaX =
+          new HdfsUserPermission(externalConfiguration.getArcadiaUser(), FsAction.EXECUTE, AclEntryType.USER);
       HdfsUserPermission vcapX =
           //TODO: should vcap be read from env or we can leave it (vcap is here only temporarily...)
           new HdfsUserPermission("vcap", FsAction.EXECUTE, AclEntryType.USER);
 
-      List<AclEntry> acl_techX_hiveX_vcapX = hdfsClient.getAcl(ImmutableList.of(techX, hiveX, vcapX), FsAction.EXECUTE);
-      List<AclEntry> acl_techRWX_hiveX_vcapX = hdfsClient.getAcl(ImmutableList.of(techRWX, hiveX, vcapX), FsAction.ALL);
+      List<AclEntry> acl_techX_hiveX_arcadiaX_vcapX =
+          hdfsClient.getAcl(ImmutableList.of(techX, hiveX, arcadiaX, vcapX), FsAction.EXECUTE);
+      List<AclEntry> acl_techRWX_hiveX_arcadiaX_vcapX =
+          hdfsClient.getAcl(ImmutableList.of(techRWX, hiveX, arcadiaX, vcapX), FsAction.ALL);
       List<AclEntry> acl_techRWX = hdfsClient.getAcl(ImmutableList.of(techRWX), FsAction.ALL);
 
-      hdfsClient.setACLForDirectory(pathCreator.createOrgPath(orgId), acl_techX_hiveX_vcapX);
-      hdfsClient.setACLForDirectory(pathCreator.createOrgBrokerPath(orgId), acl_techX_hiveX_vcapX);
-      hdfsClient.setACLForDirectory(pathCreator.createBrokerUserspacePath(orgId), acl_techRWX_hiveX_vcapX);
+      hdfsClient.setACLForDirectory(pathCreator.createOrgPath(orgId), acl_techX_hiveX_arcadiaX_vcapX);
+      hdfsClient.setACLForDirectory(pathCreator.createOrgBrokerPath(orgId), acl_techX_hiveX_arcadiaX_vcapX);
+      hdfsClient.setACLForDirectory(pathCreator.createBrokerUserspacePath(orgId), acl_techRWX_hiveX_arcadiaX_vcapX);
       hdfsClient.setACLForDirectory(pathCreator.createBrokerMetadataPath(orgId), acl_techRWX);
     } catch (IOException e) {
       throw new AuthorizableGatewayException(String.format("Can't add organization: %s", orgId), e);
