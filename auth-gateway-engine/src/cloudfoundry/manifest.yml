@@ -2,7 +2,7 @@
 applications:
 - name: auth-gateway
   buildpack: java_buildpack
-  path: target/auth-gateway-engine-${version}.jar
+  path: target/auth-gateway-engine-${project.version}.jar
   env:
     KRB_KDC: placeholder
     KRB_REALM: placeholder
@@ -23,5 +23,5 @@ applications:
     SENTRY_PORT: placeholder
     SENTRY_PRINCIPAL: placeholder
     SENTRY_SUPERUSER: placeholder
-    VERSION: ${version}
+    VERSION: ${project.version}
     SPRING_PROFILES_ACTIVE: cloud,zookeeper-auth-gateway,hdfs-auth-gateway,sentry-auth-gateway
