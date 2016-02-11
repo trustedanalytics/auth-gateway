@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.trustedanalytics</groupId>
         <artifactId>auth-gateway</artifactId>
-        <version>0.5.6</version>
+        <version>0.5.7</version>
     </parent>
     <artifactId>auth-gateway-engine</artifactId>
 
@@ -145,6 +145,20 @@
                                 <argument>--parents</argument>
                                 <argument>target/${project.build.finalName}.jar</argument>
                                 <argument>..</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>rename-jar</id>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <executable>mv</executable>
+                            <arguments>
+                                <argument>../target/${project.build.finalName}.jar</argument>
+                                <argument>../target/${project.parent.build.finalName}.jar</argument>
                             </arguments>
                         </configuration>
                     </execution>

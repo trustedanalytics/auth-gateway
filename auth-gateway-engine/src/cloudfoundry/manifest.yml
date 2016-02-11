@@ -2,7 +2,7 @@
 applications:
 - name: auth-gateway
   buildpack: java_buildpack
-  path: target/auth-gateway-engine-${project.version}.jar
+  path: target/auth-gateway-${project.version}.jar
   env:
     KRB_KDC: placeholder
     KRB_REALM: placeholder
