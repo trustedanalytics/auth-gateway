@@ -35,7 +35,7 @@ import javax.security.auth.login.LoginException;
 @Configuration
 @ConfigurationProperties("sentry.server")
 @Profile("sentry-auth-gateway")
-public class SentryClientConfiguration {
+class SentryClientConfiguration {
 
   private String address;
 

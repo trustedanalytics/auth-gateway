@@ -25,15 +25,19 @@ import org.trustedanalytics.auth.gateway.hdfs.utils.Qualifiers;
 public class ExternalConfiguration {
 
   @Value("${hdfs.clientKeytab}")
-  public String keytab;
+  private String keytab;
 
   @Value("${hdfs.superUser}")
   @NotNull
-  public String superUser;
+  private String superUser;
 
   @Value("${hdfs.hiveUser}")
   @NotNull
-  public String hiveUser;
+  private String hiveUser;
+
+  @Value("${hdfs.vcapUser}")
+  @NotNull
+  private String vcapUser;
 
   @Value("${hdfs.arcadiaUser}")
   @NotNull
@@ -43,15 +47,39 @@ public class ExternalConfiguration {
     return keytab;
   }
 
+  public void setKeytab(String keytab) {
+    this.keytab = keytab;
+  }
+
   public String getSuperUser() {
     return superUser;
+  }
+
+  public void setSuperUser(String superUser) {
+    this.superUser = superUser;
   }
 
   public String getHiveUser() {
     return hiveUser;
   }
 
+  public void setHiveUser(String hiveUser) {
+    this.hiveUser = hiveUser;
+  }
+
   public String getArcadiaUser() {
     return arcadiaUser;
+  }
+
+  public void setArcadiaUser(String arcadiaUser) {
+    this.arcadiaUser = arcadiaUser;
+  }
+
+  public String getVcapUser() {
+    return vcapUser;
+  }
+
+  public void setVcapUser(String vcapUser) {
+    this.vcapUser = vcapUser;
   }
 }

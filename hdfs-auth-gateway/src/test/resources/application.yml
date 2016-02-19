@@ -3,3 +3,4 @@ hdfs:
   superUser: ${hdfs.superuser:super}
   hiveUser: hive
   arcadiaUser: test-arcadia
+  vcapUser: test-vcap

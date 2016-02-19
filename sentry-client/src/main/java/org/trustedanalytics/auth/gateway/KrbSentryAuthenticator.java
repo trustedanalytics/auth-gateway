@@ -33,7 +33,7 @@ import javax.security.auth.login.LoginException;
 
 @Component
 @Profile("sentry-auth-gateway")
-public class KrbSentryAuthenticator implements SentryAuthenticator {
+class KrbSentryAuthenticator implements SentryAuthenticator {
 
   @Autowired
   private KrbClientConfiguration conf;

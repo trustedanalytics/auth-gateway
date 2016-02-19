@@ -1,16 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>auth-gateway</artifactId>
         <groupId>org.trustedanalytics</groupId>
-        <version>0.5.7</version>
+        <version>0.6.0</version>
     </parent>
     <artifactId>auth-gateway-commons</artifactId>
     <name>auth-gateway-commons</name>
     <dependencies>
+        <dependency>
+            <groupId>org.trustedanalytics.servicebroker.repository</groupId>
+            <artifactId>broker-store-commons</artifactId>
+            <version>${brokerStoreVersion}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.cloudfoundry</groupId>
+                    <artifactId>spring-boot-cf-service-broker</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.cloudfoundry</groupId>
+                    <artifactId>spring-boot-cf-service-broker-tests</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <dependency>
             <groupId>org.trustedanalytics</groupId>
             <artifactId>hadoop-utils</artifactId>
@@ -35,6 +49,10 @@
                 <exclusion>
                     <groupId>org.apache.hadoop</groupId>
                     <artifactId>hadoop-common</artifactId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>powermock-release-with-junit-mockito-dependencies</artifactId>
+                    <groupId>org.powermock</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -62,5 +80,4 @@
             </exclusions>
         </dependency>
     </dependencies>
-
 </project>

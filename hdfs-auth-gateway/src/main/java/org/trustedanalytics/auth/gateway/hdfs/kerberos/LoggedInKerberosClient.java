@@ -13,18 +13,19 @@
  */
 package org.trustedanalytics.auth.gateway.hdfs.kerberos;
 
+import java.io.IOException;
+
+import javax.security.auth.login.LoginException;
+
+import org.apache.hadoop.conf.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.trustedanalytics.auth.gateway.KeyTab;
 import org.trustedanalytics.auth.gateway.SystemEnvironment;
 import org.trustedanalytics.hadoop.kerberos.KrbLoginManager;
 import org.trustedanalytics.hadoop.kerberos.KrbLoginManagerFactory;
 
-import org.apache.hadoop.conf.Configuration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import sun.security.krb5.KrbException;
-
-import javax.security.auth.login.LoginException;
-import java.io.IOException;
 
 public class LoggedInKerberosClient {
 

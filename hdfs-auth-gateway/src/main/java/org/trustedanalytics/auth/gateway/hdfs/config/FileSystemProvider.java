@@ -13,12 +13,12 @@
  */
 package org.trustedanalytics.auth.gateway.hdfs.config;
 
-import org.trustedanalytics.auth.gateway.SystemEnvironment;
-import org.trustedanalytics.auth.gateway.hdfs.kerberos.KerberosProperties;
-import org.trustedanalytics.auth.gateway.hdfs.kerberos.LoggedInKerberosClient;
-import org.trustedanalytics.auth.gateway.hdfs.utils.Qualifiers;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
-import com.google.common.base.Throwables;
+import javax.security.auth.login.LoginException;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.slf4j.Logger;
@@ -26,12 +26,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
+import org.trustedanalytics.auth.gateway.SystemEnvironment;
+import org.trustedanalytics.auth.gateway.hdfs.kerberos.KerberosProperties;
+import org.trustedanalytics.auth.gateway.hdfs.kerberos.LoggedInKerberosClient;
+import org.trustedanalytics.auth.gateway.hdfs.utils.Qualifiers;
+
 import sun.security.krb5.KrbException;
 
-import javax.security.auth.login.LoginException;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import com.google.common.base.Throwables;
 
 @Profile(Qualifiers.HDFS)
 @org.springframework.context.annotation.Configuration

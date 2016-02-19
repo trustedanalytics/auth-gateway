@@ -15,42 +15,32 @@
  */
 package org.trustedanalytics.auth.gateway;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
+import java.io.IOException;
 
 import org.apache.hadoop.security.SaslRpcServer;
 import org.apache.hadoop.security.SecurityUtil;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.sentry.SentryUserException;
 import org.apache.sentry.provider.db.SentryAlreadyExistsException;
-import org.apache.sentry.provider.db.service.thrift.SentryPolicyService;
-import org.apache.sentry.provider.db.service.thrift.SentryPolicyServiceClient;
-import org.apache.sentry.provider.db.service.thrift.SentryPolicyStoreProcessor;
-import org.apache.sentry.provider.db.service.thrift.TAlterSentryRoleAddGroupsRequest;
-import org.apache.sentry.provider.db.service.thrift.TAlterSentryRoleAddGroupsResponse;
-import org.apache.sentry.provider.db.service.thrift.TCreateSentryRoleRequest;
-import org.apache.sentry.provider.db.service.thrift.TCreateSentryRoleResponse;
-import org.apache.sentry.provider.db.service.thrift.TDropSentryRoleRequest;
-import org.apache.sentry.provider.db.service.thrift.TDropSentryRoleResponse;
-import org.apache.sentry.provider.db.service.thrift.TSentryGroup;
+import org.apache.sentry.provider.db.generic.service.thrift.SentryGenericServiceClient;
+import org.apache.sentry.provider.db.service.thrift.*;
 import org.apache.sentry.service.thrift.ServiceConstants;
-import sentry.org.apache.thrift.protocol.TBinaryProtocol;
-import sentry.org.apache.thrift.protocol.TMultiplexedProtocol;
-import sentry.org.apache.thrift.protocol.TProtocol;
-import sentry.org.apache.thrift.transport.TTransport;
-import sentry.org.apache.thrift.transport.TTransportException;
-import sentry.org.apache.thrift.transport.TSocket;
-
 import org.apache.sentry.service.thrift.Status;
-import sentry.org.apache.thrift.TException;
-
+import org.apache.thrift.TException;
+import org.apache.thrift.protocol.TBinaryProtocol;
+import org.apache.thrift.protocol.TMultiplexedProtocol;
+import org.apache.thrift.protocol.TProtocol;
+import org.apache.thrift.transport.TSocket;
+import org.apache.thrift.transport.TTransport;
+import org.apache.thrift.transport.TTransportException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
 
-import java.io.IOException;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 
-public class CustomSentryPolicyServiceClient {
+class CustomSentryPolicyServiceClient {
 
   private static final Logger LOGGER =
       LoggerFactory.getLogger(CustomSentryPolicyServiceClient.class);
@@ -232,7 +222,7 @@ public class CustomSentryPolicyServiceClient {
 
   }
 
-  private class SaslClientTransport extends SentryPolicyServiceClient.UgiSaslClientTransport {
+  private class SaslClientTransport extends SentryGenericServiceClient.UgiSaslClientTransport {
     SaslClientTransport(String protocol, String serverName)
         throws IOException {
       super(SaslRpcServer.AuthMethod.KERBEROS.getMechanismName(),

@@ -13,10 +13,21 @@
  */
 package org.trustedanalytics.auth.gateway.hdfs;
 
-import com.google.common.collect.ImmutableList;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.powermock.api.mockito.PowerMockito.when;
+
+import java.io.IOException;
+import java.util.List;
+
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.permission.*;
+import org.apache.hadoop.fs.permission.AclEntry;
+import org.apache.hadoop.fs.permission.AclEntryType;
+import org.apache.hadoop.fs.permission.FsAction;
+import org.apache.hadoop.fs.permission.FsPermission;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,14 +37,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.trustedanalytics.auth.gateway.hdfs.config.ExternalConfiguration;
 import org.trustedanalytics.auth.gateway.hdfs.config.FileSystemProvider;
 
-import java.io.IOException;
-import java.util.List;
-
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.when;
+import com.google.common.collect.ImmutableMap;
 
 @RunWith(MockitoJUnitRunner.class)
 public class HdfsClientTest {
@@ -71,7 +75,6 @@ public class HdfsClientTest {
     verify(fileSystem).mkdirs(TEST_PATH);
     verify(fileSystem).setPermission(TEST_PATH, userPermission);
     verify(fileSystem).setOwner(TEST_PATH, "test_admin", "test");
-    verify(fileSystemProvider).getFileSystem();
   }
 
   @Test()
@@ -82,7 +85,6 @@ public class HdfsClientTest {
     verify(fileSystem, times(0)).mkdirs(TEST_PATH);
     verify(fileSystem, times(0)).setPermission(TEST_PATH, userPermission);
     verify(fileSystem, times(0)).setOwner(TEST_PATH, "test_admin", "test");
-    verify(fileSystemProvider).getFileSystem();
   }
 
   @Test
@@ -93,7 +95,6 @@ public class HdfsClientTest {
 
     verify(fileSystem).exists(TEST_PATH);
     verify(fileSystem).delete(TEST_PATH, true);
-    verify(fileSystemProvider).getFileSystem();
   }
 
   @Test
@@ -103,24 +104,25 @@ public class HdfsClientTest {
     hdfsClient.deleteDirectory(TEST_PATH);
     verify(fileSystem, times(0)).mkdirs(TEST_PATH, userPermission);
     verify(fileSystem, times(0)).setOwner(TEST_PATH, "test_admin", "test");
-    verify(fileSystemProvider).getFileSystem();
   }
 
   @Test
   public void getAcl_getAclCalled_aclEntryCreated() throws IOException {
-    List<AclEntry> userAcl = hdfsClient.getAcl(
-        ImmutableList.of(
-            new HdfsUserPermission("test_user", FsAction.ALL, AclEntryType.USER),
-            new HdfsUserPermission("test_user2", FsAction.READ_EXECUTE, AclEntryType.USER)),
-        FsAction.ALL);
+    List<AclEntry> userAcl =
+        HdfsAclBuilder
+            .newInstanceWithDefaultEntries(FsAction.ALL)
+            .withUsersAclEntry(
+                ImmutableMap.of("test_user", FsAction.ALL, "test_user2", FsAction.READ_EXECUTE))
+            .build();
 
-    assertUserAcl(userAcl.get(0), "test_user", FsAction.ALL, AclEntryType.USER);
-    assertUserAcl(userAcl.get(1), "test_user2", FsAction.READ_EXECUTE, AclEntryType.USER);
-    assertUserAcl(userAcl.get(2), FsAction.ALL, AclEntryType.GROUP);
-    assertUserAcl(userAcl.get(3), FsAction.ALL, AclEntryType.MASK);
+    assertUserAcl(userAcl.get(0), FsAction.ALL, AclEntryType.GROUP);
+    assertUserAcl(userAcl.get(1), FsAction.ALL, AclEntryType.MASK);
+    assertUserAcl(userAcl.get(2), "test_user", FsAction.ALL, AclEntryType.USER);
+    assertUserAcl(userAcl.get(3), "test_user2", FsAction.READ_EXECUTE, AclEntryType.USER);
   }
 
-  private void assertUserAcl(AclEntry aclEntry, String name, FsAction fsAction, AclEntryType entryType) {
+  private void assertUserAcl(AclEntry aclEntry, String name, FsAction fsAction,
+      AclEntryType entryType) {
     assertUserAcl(aclEntry, fsAction, entryType);
     assertThat(aclEntry.getName(), equalTo(name));
   }

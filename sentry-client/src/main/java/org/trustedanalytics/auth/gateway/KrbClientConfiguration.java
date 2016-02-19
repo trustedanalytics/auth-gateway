@@ -26,7 +26,7 @@ import javax.security.auth.login.LoginException;
 
 @Component
 @Profile("sentry-auth-gateway")
-public class KrbClientConfiguration {
+class KrbClientConfiguration {
 
   private String kdc;
 

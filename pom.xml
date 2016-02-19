@@ -1,10 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>auth-gateway</artifactId>
-    <version>0.5.7</version>
+    <version>0.6.0</version>
     <packaging>pom</packaging>
 
     <name>auth-gateway</name>
@@ -12,12 +11,13 @@
     <parent>
         <groupId>org.trustedanalytics</groupId>
         <artifactId>trustedanalytics-cloud-parent</artifactId>
-        <version>0.4.2</version>
+        <version>0.5.0</version>
     </parent>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	    <hadoop.utils.version>0.5.5</hadoop.utils.version>
+        <hadoop.utils.version>0.5.8</hadoop.utils.version>
+        <brokerStoreVersion>0.5.10</brokerStoreVersion>
         <auth-gateway.version>${version}</auth-gateway.version>
     </properties>
 
@@ -39,6 +39,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+            <exclusions></exclusions>
         </dependency>
 
         <!-- tag::provided[] -->
@@ -51,20 +52,44 @@
         <!-- end::provided[] -->
 
         <!-- tag::test[] -->
+        <!-- Exclusions in line with this instruction: https://tedvinke.wordpress.com/2013/12/17/mixing-junit-hamcrest-and-mockito-explaining-nosuchmethoderror/ -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>hamcrest-core</artifactId>
+                    <groupId>org.hamcrest</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>hamcrest-core</artifactId>
+                    <groupId>org.hamcrest</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-all</artifactId>
+            <version>1.3</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>hamcrest-core</artifactId>
+                    <groupId>org.hamcrest</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- end::test[] -->
     </dependencies>

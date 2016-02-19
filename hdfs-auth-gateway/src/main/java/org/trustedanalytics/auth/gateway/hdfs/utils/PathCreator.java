@@ -27,43 +27,37 @@ public class PathCreator {
 
   private static final String BROKER = "brokers";
 
-  private static final String BROKER_METADATA = "metadata";
-
   private static final String BROKER_USERSPACE = "userspace";
 
   private static final String TMP = "tmp";
 
   private static final String APP = "apps";
 
-  public Path createOrgBrokerPath(String org) {
+  public Path getBrokerPath(String org) {
     return createPath(ORGS, org, BROKER);
   }
 
-  public Path createBrokerUserspacePath(String org) {
+  public Path getUserspacePath(String org) {
     return createPath(ORGS, org, BROKER, BROKER_USERSPACE);
   }
 
-  public Path createBrokerMetadataPath(String org) {
-    return createPath(ORGS, org, BROKER, BROKER_METADATA);
-  }
-
-  public Path createOrgTmpPath(String org) {
+  public Path getTmpPath(String org) {
     return createPath(ORGS, org, TMP);
   }
 
-  public Path createOrgAppPath(String org) {
+  public Path getAppPath(String org) {
     return createPath(ORGS, org, APP);
   }
 
-  public Path createOrgPath(String org) {
+  public Path getOrgPath(String org) {
     return createPath(ORGS, org);
   }
 
-  public Path createOrgUsersPath(String org) {
+  public Path getUsersPath(String org) {
     return createPath(ORGS, org, USER);
   }
 
-  public Path createUserPath(String org, String user) {
+  public Path getUserPath(String org, String user) {
     return createPath(ORGS, org, USER, user);
   }
 

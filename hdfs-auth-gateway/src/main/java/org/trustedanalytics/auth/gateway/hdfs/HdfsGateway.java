@@ -16,20 +16,22 @@ package org.trustedanalytics.auth.gateway.hdfs;
 import java.io.IOException;
 import java.util.List;
 
-import com.google.common.collect.ImmutableList;
 import org.apache.hadoop.fs.permission.AclEntry;
-import org.apache.hadoop.fs.permission.AclEntryType;
 import org.apache.hadoop.fs.permission.FsAction;
+import org.apache.hadoop.fs.permission.FsPermission;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-
 import org.trustedanalytics.auth.gateway.hdfs.config.ExternalConfiguration;
+import org.trustedanalytics.auth.gateway.hdfs.config.FileSystemProvider;
 import org.trustedanalytics.auth.gateway.hdfs.kerberos.KerberosProperties;
 import org.trustedanalytics.auth.gateway.hdfs.utils.PathCreator;
 import org.trustedanalytics.auth.gateway.hdfs.utils.Qualifiers;
 import org.trustedanalytics.auth.gateway.spi.Authorizable;
 import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
+
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
 
 @Profile(Qualifiers.HDFS)
 @Configuration
@@ -40,57 +42,39 @@ public class HdfsGateway implements Authorizable {
   private static final String ADMIN_POSTFIX = "_admin";
 
   @Autowired
-  private KerberosProperties kerberosProperties;
+  private KerberosProperties krbProperties;
 
   @Autowired
-  private ExternalConfiguration externalConfiguration;
+  private ExternalConfiguration config;
 
   @Autowired
-  private PathCreator pathCreator;
+  private PathCreator paths;
 
   @Autowired
-  private HdfsClient hdfsClient;
+  private FileSystemProvider fileSystemProvider;
 
   @Override
   public void addOrganization(String orgId) throws AuthorizableGatewayException {
+    FsPermission usrAllGroupAll = HdfsPermission.USER_ALL_GROUP_ALL.getPermission();
+    FsPermission usrAllGroupExec = HdfsPermission.USER_ALL_GROUP_EXECUTE.getPermission();
+    List<AclEntry> defaultWithKrbTechUserExec =
+        getDefaultAclWithKrbTechUserAction(FsAction.EXECUTE, FsAction.EXECUTE);
+    List<AclEntry> defaultWithTechUserAll =
+        getDefaultAclWithKrbTechUserAction(FsAction.ALL, FsAction.ALL);
+    String orgAdmin = orgId.concat(ADMIN_POSTFIX);
+
     try {
-      hdfsClient.createDirectory(pathCreator.createOrgPath(orgId), orgId.concat(ADMIN_POSTFIX),orgId,
-          HdfsPermission.USER_ALL_GROUP_EXECUTE.getPermission());
-      hdfsClient.createDirectory(pathCreator.createOrgUsersPath(orgId), orgId.concat(ADMIN_POSTFIX), orgId,
-          HdfsPermission.USER_ALL_GROUP_EXECUTE.getPermission());
-      hdfsClient.createDirectory(pathCreator.createOrgTmpPath(orgId), orgId.concat(ADMIN_POSTFIX), orgId,
-          HdfsPermission.USER_ALL_GROUP_ALL.getPermission());
-      hdfsClient.createDirectory(pathCreator.createOrgAppPath(orgId), orgId.concat(ADMIN_POSTFIX), orgId,
-          HdfsPermission.USER_ALL_GROUP_EXECUTE.getPermission());
-      hdfsClient.createDirectory(pathCreator.createOrgBrokerPath(orgId), orgId.concat(ADMIN_POSTFIX), orgId,
-          HdfsPermission.USER_ALL_GROUP_EXECUTE.getPermission());
-      hdfsClient.createDirectory(pathCreator.createBrokerMetadataPath(orgId), orgId.concat(ADMIN_POSTFIX), orgId,
-          HdfsPermission.USER_ALL_GROUP_EXECUTE.getPermission());
-      hdfsClient.createDirectory(pathCreator.createBrokerUserspacePath(orgId), orgId.concat(ADMIN_POSTFIX), orgId,
-          HdfsPermission.USER_ALL_GROUP_EXECUTE.getPermission());
+      HdfsClient hdfsClient = HdfsClient.getNewInstance(fileSystemProvider.getFileSystem());
 
-      HdfsUserPermission techX =
-          new HdfsUserPermission(kerberosProperties.getTechnicalPrincipal(), FsAction.EXECUTE, AclEntryType.USER);
-      HdfsUserPermission techRWX =
-          new HdfsUserPermission(kerberosProperties.getTechnicalPrincipal(), FsAction.ALL, AclEntryType.USER);
-      HdfsUserPermission hiveX =
-          new HdfsUserPermission(externalConfiguration.getHiveUser(), FsAction.EXECUTE, AclEntryType.USER);
-      HdfsUserPermission arcadiaX =
-          new HdfsUserPermission(externalConfiguration.getArcadiaUser(), FsAction.EXECUTE, AclEntryType.USER);
-      HdfsUserPermission vcapX =
-          //TODO: should vcap be read from env or we can leave it (vcap is here only temporarily...)
-          new HdfsUserPermission("vcap", FsAction.EXECUTE, AclEntryType.USER);
-
-      List<AclEntry> acl_techX_hiveX_arcadiaX_vcapX =
-          hdfsClient.getAcl(ImmutableList.of(techX, hiveX, arcadiaX, vcapX), FsAction.EXECUTE);
-      List<AclEntry> acl_techRWX_hiveX_arcadiaX_vcapX =
-          hdfsClient.getAcl(ImmutableList.of(techRWX, hiveX, arcadiaX, vcapX), FsAction.ALL);
-      List<AclEntry> acl_techRWX = hdfsClient.getAcl(ImmutableList.of(techRWX), FsAction.ALL);
-
-      hdfsClient.setACLForDirectory(pathCreator.createOrgPath(orgId), acl_techX_hiveX_arcadiaX_vcapX);
-      hdfsClient.setACLForDirectory(pathCreator.createOrgBrokerPath(orgId), acl_techX_hiveX_arcadiaX_vcapX);
-      hdfsClient.setACLForDirectory(pathCreator.createBrokerUserspacePath(orgId), acl_techRWX_hiveX_arcadiaX_vcapX);
-      hdfsClient.setACLForDirectory(pathCreator.createBrokerMetadataPath(orgId), acl_techRWX);
+      hdfsClient.createDirectoryWithAcl(paths.getOrgPath(orgId), orgAdmin, orgId, usrAllGroupExec,
+          defaultWithKrbTechUserExec);
+      hdfsClient.createDirectoryWithAcl(paths.getBrokerPath(orgId), orgAdmin, orgId,
+          usrAllGroupExec, defaultWithKrbTechUserExec);
+      hdfsClient.createDirectoryWithAcl(paths.getUserspacePath(orgId), orgAdmin, orgId,
+          usrAllGroupExec, defaultWithTechUserAll);
+      hdfsClient.createDirectory(paths.getUsersPath(orgId), orgAdmin, orgId, usrAllGroupExec);
+      hdfsClient.createDirectory(paths.getTmpPath(orgId), orgAdmin, orgId, usrAllGroupAll);
+      hdfsClient.createDirectory(paths.getAppPath(orgId), orgAdmin, orgId, usrAllGroupExec);
     } catch (IOException e) {
       throw new AuthorizableGatewayException(String.format("Can't add organization: %s", orgId), e);
     }
@@ -99,7 +83,8 @@ public class HdfsGateway implements Authorizable {
   @Override
   public void removeOrganization(String orgId) throws AuthorizableGatewayException {
     try {
-      hdfsClient.deleteDirectory(pathCreator.createOrgPath(orgId));
+      HdfsClient hdfsClient = HdfsClient.getNewInstance(fileSystemProvider.getFileSystem());
+      hdfsClient.deleteDirectory(paths.getOrgPath(orgId));
     } catch (IOException e) {
       throw new AuthorizableGatewayException(String.format("Can't remove organization: %s", orgId),
           e);
@@ -109,7 +94,8 @@ public class HdfsGateway implements Authorizable {
   @Override
   public void addUserToOrg(String userId, String orgId) throws AuthorizableGatewayException {
     try {
-      hdfsClient.createDirectory(pathCreator.createUserPath(orgId, userId), userId, orgId,
+      HdfsClient hdfsClient = HdfsClient.getNewInstance(fileSystemProvider.getFileSystem());
+      hdfsClient.createDirectory(paths.getUserPath(orgId, userId), userId, orgId,
           HdfsPermission.USER_ALL.getPermission());
     } catch (IOException e) {
       throw new AuthorizableGatewayException(String.format("Can't add user: %s", userId), e);
@@ -119,7 +105,8 @@ public class HdfsGateway implements Authorizable {
   @Override
   public void removeUserFromOrg(String userId, String orgId) throws AuthorizableGatewayException {
     try {
-      hdfsClient.deleteDirectory(pathCreator.createUserPath(orgId, userId));
+      HdfsClient hdfsClient = HdfsClient.getNewInstance(fileSystemProvider.getFileSystem());
+      hdfsClient.deleteDirectory(paths.getUserPath(orgId, userId));
     } catch (IOException e) {
       throw new AuthorizableGatewayException(String.format("Can't remove user: %s from org: %s",
           userId, orgId), e);
@@ -137,4 +124,13 @@ public class HdfsGateway implements Authorizable {
     return NAME;
   }
 
+  @VisibleForTesting
+  List<AclEntry> getDefaultAclWithKrbTechUserAction(FsAction groupAction, FsAction techUserAction) {
+    return HdfsAclBuilder
+        .newInstanceWithDefaultEntries(groupAction)
+        .withUsersAclEntry(
+            ImmutableMap.of(config.getArcadiaUser(), FsAction.EXECUTE, config.getHiveUser(),
+                FsAction.EXECUTE, config.getVcapUser(), FsAction.EXECUTE))
+        .withUserAclEntry(krbProperties.getTechnicalPrincipal(), techUserAction).build();
+  }
 }

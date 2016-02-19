@@ -55,8 +55,6 @@ public class HdfsGatewayIntegrationTest {
 
   private FsPermission groupPermission;
 
-  private FsPermission aclUserPermission;
-
   private FsPermission groupExecPermission;
 
   private static final Path TEST_ORG_ROOT = new Path("/org");
@@ -64,8 +62,6 @@ public class HdfsGatewayIntegrationTest {
   private static final Path TEST_ORG_PATH = new Path("/org/intel");
 
   private static final Path TEST_ORG_BROKER_PATH = new Path("/org/intel/brokers");
-
-  private static final Path TEST_ORG_METADATA_PATH = new Path("/org/intel/brokers/metadata");
 
   private static final Path TEST_ORG_USERSPACE_PATH = new Path("/org/intel/brokers/userspace");
 
@@ -81,7 +77,6 @@ public class HdfsGatewayIntegrationTest {
   public void init() throws IOException {
     userPermission = new FsPermission(FsAction.ALL, FsAction.NONE, FsAction.NONE);
     groupPermission = new FsPermission(FsAction.ALL, FsAction.ALL, FsAction.NONE);
-    aclUserPermission = new FsPermission(FsAction.ALL, FsAction.ALL, FsAction.NONE);
     groupExecPermission = new FsPermission(FsAction.ALL, FsAction.EXECUTE, FsAction.NONE);
 
     fileSystem = fileSystemProvider.getFileSystem();
@@ -98,13 +93,15 @@ public class HdfsGatewayIntegrationTest {
     checkIfDirectoryExistsWithPermissions(TEST_ORG_TMP_PATH, "intel_admin", groupPermission);
     checkIfDirectoryExistsWithPermissions(TEST_ORG_APP_PATH, "intel_admin", groupExecPermission);
     checkIfDirectoryExistsWithPermissions(TEST_ORG_BROKER_PATH, "intel_admin", groupExecPermission);
-    checkIfDirectoryExistsWithPermissions(TEST_ORG_METADATA_PATH, "intel_admin", aclUserPermission);
-    checkIfDirectoryExistsWithPermissions(TEST_ORG_USERSPACE_PATH, "intel_admin", aclUserPermission);
 
-    checkIfDirectoryExistsWithACL(TEST_ORG_PATH, "intel_admin", new String []{"test_cf", "hive", "vcap", "test-arcadia"});
-    checkIfDirectoryExistsWithACL(TEST_ORG_BROKER_PATH, "intel_admin", new String []{"test_cf", "hive", "vcap", "test-arcadia"});
-    checkIfDirectoryExistsWithACL(TEST_ORG_METADATA_PATH, "intel_admin", new String []{"test_cf"});
-    checkIfDirectoryExistsWithACL(TEST_ORG_USERSPACE_PATH, "intel_admin", new String []{"test_cf", "hive", "vcap", "test-arcadia"});
+    checkIfDirectoryExistsWithPermissions(TEST_ORG_USERSPACE_PATH, "intel_admin", groupPermission);
+
+    checkIfDirectoryExistsWithACL(TEST_ORG_PATH, "intel_admin", new String[] {"test_cf", "hive",
+        "test-vcap", "test-arcadia"});
+    checkIfDirectoryExistsWithACL(TEST_ORG_BROKER_PATH, "intel_admin", new String[] {"test_cf",
+        "hive", "test-vcap", "test-arcadia"});
+    checkIfDirectoryExistsWithACL(TEST_ORG_USERSPACE_PATH, "intel_admin", new String[] {"test_cf",
+        "hive", "test-vcap", "test-arcadia"});
   }
 
   @Test
@@ -180,10 +177,8 @@ public class HdfsGatewayIntegrationTest {
     assertThat(s.getOwner(), equalTo(owner));
 
     List<String> usersWithAcl =
-        s.getEntries().stream()
-            .filter(entry -> entry.getType().equals(AclEntryType.USER))
-            .map(AclEntry::getName)
-            .collect(toList());
+        s.getEntries().stream().filter(entry -> entry.getType().equals(AclEntryType.USER))
+            .map(AclEntry::getName).collect(toList());
 
     assertThat(usersWithAcl.size(), equalTo(privilegedUsers.length));
     assertThat(usersWithAcl, containsInAnyOrder(privilegedUsers));

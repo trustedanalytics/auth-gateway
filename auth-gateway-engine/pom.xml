@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.trustedanalytics</groupId>
         <artifactId>auth-gateway</artifactId>
-        <version>0.5.7</version>
+        <version>0.6.0</version>
     </parent>
     <artifactId>auth-gateway-engine</artifactId>
 
@@ -54,13 +54,13 @@
             <version>${auth-gateway.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>4.4.4</version>
         </dependency>
         <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <scope>test</scope>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
         <dependency>
             <groupId>com.jayway.restassured</groupId>

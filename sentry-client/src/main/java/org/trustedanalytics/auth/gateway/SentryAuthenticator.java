@@ -23,7 +23,7 @@ import java.io.IOException;
 
 import javax.security.auth.login.LoginException;
 
-public interface SentryAuthenticator {
+interface SentryAuthenticator {
 
   UserGroupInformation sentryUserUGI() throws LoginException, IOException, KrbException;
 
