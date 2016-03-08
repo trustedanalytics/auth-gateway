@@ -1,3 +1,5 @@
+security:
+    ignored: /v2/api-docs
 engine:
   timeout: 10
 hdfs:

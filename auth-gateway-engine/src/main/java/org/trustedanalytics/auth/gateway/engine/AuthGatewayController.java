@@ -13,6 +13,7 @@
  */
 package org.trustedanalytics.auth.gateway.engine;
 
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,12 +37,15 @@ class AuthGatewayController {
         authGatewayEngine.addUser(userId);
     }
 
+    @ApiOperation("Creating organization: in case of hdfs - creating directory, zookeeper - creating znode, " +
+            "sentry - roles on cdh cluster, hgm - usergroupmapping")
     @RequestMapping(value = "/organizations/{orgId}", method = RequestMethod.PUT)
     public void addOrganization(@PathVariable String orgId)
             throws AuthorizableGatewayException {
         authGatewayEngine.addOrganization(orgId);
     }
 
+    @ApiOperation("Adding user's access to hadoop components in given organization")
     @RequestMapping(value = "/organizations/{orgId}/users/{userId}", method = RequestMethod.PUT)
     public void addUserToOrganization(@PathVariable String userId, @PathVariable String orgId)
             throws AuthorizableGatewayException {
@@ -54,12 +58,15 @@ class AuthGatewayController {
         authGatewayEngine.removeUser(userId);
     }
 
+    @ApiOperation("Removing organization: in case of hdfs - removing directory, zookeeper - removing znode, " +
+            "sentry - roles on cdh cluster, hgm - usergroupmapping")
     @RequestMapping(value = "/organizations/{orgId}", method = RequestMethod.DELETE)
     public void deleteOrganization(@PathVariable String orgId)
             throws AuthorizableGatewayException {
         authGatewayEngine.removeOrganization(orgId);
     }
 
+    @ApiOperation("Removing user's access to hadoop components in given organization")
     @RequestMapping(value = "/organizations/{orgId}/users/{userId}", method = RequestMethod.DELETE)
     public void deleteUserFromOrganization(@PathVariable String userId, @PathVariable String orgId)
             throws AuthorizableGatewayException {
