@@ -46,18 +46,20 @@ class KrbSentryAuthenticator implements SentryAuthenticator {
         KrbLoginManagerFactory.getInstance().getKrbLoginManagerInstance(conf.getKdc(),
                                                                         conf.getRealm());
     Subject subject = loginManager.loginWithKeyTab(conf.getSuperUser(), conf.getKeyTabPath());
-    Configuration conf = new Configuration();
-    conf.set("hadoop.security.authentication", "kerberos");
-    loginManager.loginInHadoop(subject, conf);
+    Configuration hadoopConf = new Configuration();
+    hadoopConf.set("hadoop.security.authentication", "kerberos");
+    loginManager.loginInHadoop(subject, hadoopConf);
     return loginManager.getUGI(subject);
   }
 
+  @Override
   public String getSuperUser() throws IOException {
     KerberosName princName =
         new KerberosName(conf.getSuperUser().concat("@").concat(conf.getRealm()));
     return princName.getShortName();
   }
 
+  @Override
   public String getRealm() {
     return conf.getRealm();
   }

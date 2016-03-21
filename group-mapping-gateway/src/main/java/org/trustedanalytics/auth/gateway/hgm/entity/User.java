@@ -13,8 +13,6 @@
  */
 package org.trustedanalytics.auth.gateway.hgm.entity;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public final class User {

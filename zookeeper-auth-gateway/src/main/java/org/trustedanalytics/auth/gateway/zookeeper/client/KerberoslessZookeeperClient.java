@@ -39,7 +39,7 @@ public class KerberoslessZookeeperClient implements ZookeeperClient {
     try {
       curatorClient.create().forPath(pathOps.makePath(znodePath));
     } catch (KeeperException.NodeExistsException e) {
-      LOGGER.info("Caught: '" + e.getMessage() + "' while creating node. Nothing to do.");
+      LOGGER.info("Caught: '" + e.getMessage() + "' while creating node. Nothing to do.", e);
     }
   }
 
@@ -48,7 +48,7 @@ public class KerberoslessZookeeperClient implements ZookeeperClient {
     try {
       curatorClient.delete().forPath(pathOps.makePath(znodePath));
     } catch (KeeperException.NoNodeException e) {
-      LOGGER.info("Caught: '" + e.getMessage() + "' while deleting node. Nothing to do.");
+      LOGGER.info("Caught: '" + e.getMessage() + "' while deleting node. Nothing to do.", e);
     }
   }
 

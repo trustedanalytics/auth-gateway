@@ -22,4 +22,7 @@ public final class ApiEndpoints {
   public static final String USERS = "/groups/{group}/users";
 
   public static final String USER = "/groups/{group}/users/{user}";
+
+  private ApiEndpoints() {
+  }
 }

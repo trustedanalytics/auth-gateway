@@ -55,8 +55,8 @@ public class HdfsGateway implements Authorizable {
 
   @Override
   public void addOrganization(String orgId) throws AuthorizableGatewayException {
-    FsPermission usrAllGroupAll = HdfsPermission.USER_ALL_GROUP_ALL.getPermission();
-    FsPermission usrAllGroupExec = HdfsPermission.USER_ALL_GROUP_EXECUTE.getPermission();
+    FsPermission usrAllGroupAll = HdfsPermission.USER_ALL_GROUP_ALL;
+    FsPermission usrAllGroupExec = HdfsPermission.USER_ALL_GROUP_EXECUTE;
     List<AclEntry> defaultWithKrbTechUserExec =
         getDefaultAclWithKrbTechUserAction(FsAction.EXECUTE, FsAction.EXECUTE);
     List<AclEntry> defaultWithTechUserAll =
@@ -96,7 +96,7 @@ public class HdfsGateway implements Authorizable {
     try {
       HdfsClient hdfsClient = HdfsClient.getNewInstance(fileSystemProvider.getFileSystem());
       hdfsClient.createDirectory(paths.getUserPath(orgId, userId), userId, orgId,
-          HdfsPermission.USER_ALL.getPermission());
+          HdfsPermission.USER_ALL);
     } catch (IOException e) {
       throw new AuthorizableGatewayException(String.format("Can't add user: %s", userId), e);
     }
@@ -108,16 +108,18 @@ public class HdfsGateway implements Authorizable {
       HdfsClient hdfsClient = HdfsClient.getNewInstance(fileSystemProvider.getFileSystem());
       hdfsClient.deleteDirectory(paths.getUserPath(orgId, userId));
     } catch (IOException e) {
-      throw new AuthorizableGatewayException(String.format("Can't remove user: %s from org: %s",
-          userId, orgId), e);
+      throw new AuthorizableGatewayException(
+          String.format("Can't remove user: %s from org: %s", userId, orgId), e);
     }
   }
 
   @Override
-  public void addUser(String userId) throws AuthorizableGatewayException {}
+  public void addUser(String userId) throws AuthorizableGatewayException {
+  }
 
   @Override
-  public void removeUser(String userId) throws AuthorizableGatewayException {}
+  public void removeUser(String userId) throws AuthorizableGatewayException {
+  }
 
   @Override
   public String getName() {
@@ -126,11 +128,9 @@ public class HdfsGateway implements Authorizable {
 
   @VisibleForTesting
   List<AclEntry> getDefaultAclWithKrbTechUserAction(FsAction groupAction, FsAction techUserAction) {
-    return HdfsAclBuilder
-        .newInstanceWithDefaultEntries(groupAction)
-        .withUsersAclEntry(
-            ImmutableMap.of(config.getArcadiaUser(), FsAction.EXECUTE, config.getHiveUser(),
-                FsAction.EXECUTE, config.getVcapUser(), FsAction.EXECUTE))
+    return HdfsAclBuilder.newInstanceWithDefaultEntries(groupAction)
+        .withUsersAclEntry(ImmutableMap.of(config.getArcadiaUser(), FsAction.EXECUTE,
+            config.getHiveUser(), FsAction.EXECUTE, config.getVcapUser(), FsAction.EXECUTE))
         .withUserAclEntry(krbProperties.getTechnicalPrincipal(), techUserAction).build();
   }
 }

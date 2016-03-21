@@ -16,4 +16,7 @@ package org.trustedanalytics.auth.gateway.hgm.utils;
 public final class Qualifiers {
   public static final String KERBEROS = "kerberos-hgm-auth-gateway";
   public static final String HTTPS = "https-hgm-auth-gateway";
+
+  private Qualifiers() {
+  }
 }

@@ -34,17 +34,17 @@ public final class ZookeeperGatewayFactory {
   private final KerberosClient kerberosClient;
   private final Function<CuratorFrameworkFactory.Builder, CuratorFrameworkFactory.Builder> customCuratorBuilderSteps;
 
-  public static ZookeeperGatewayFactory newInstance(ZookeeperAuthorizationEnv env,
-      KerberosClient kerberosClient,
-      Function<CuratorFrameworkFactory.Builder, CuratorFrameworkFactory.Builder> customCuratorBuilderSteps) {
-    return new ZookeeperGatewayFactory(env, kerberosClient, customCuratorBuilderSteps);
-  }
-
   private ZookeeperGatewayFactory(ZookeeperAuthorizationEnv env, KerberosClient kerberosClient,
       Function<CuratorFrameworkFactory.Builder, CuratorFrameworkFactory.Builder> customCuratorBuilderSteps) {
     this.env = env;
     this.kerberosClient = kerberosClient;
     this.customCuratorBuilderSteps = customCuratorBuilderSteps;
+  }
+  
+  public static ZookeeperGatewayFactory newInstance(ZookeeperAuthorizationEnv env,
+      KerberosClient kerberosClient,
+      Function<CuratorFrameworkFactory.Builder, CuratorFrameworkFactory.Builder> customCuratorBuilderSteps) {
+    return new ZookeeperGatewayFactory(env, kerberosClient, customCuratorBuilderSteps);
   }
 
   public Authorizable create() throws IOException, LoginException {

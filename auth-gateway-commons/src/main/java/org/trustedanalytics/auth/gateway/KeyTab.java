@@ -37,7 +37,22 @@ public final class KeyTab {
 
   private static final String KEY_TAB_FILE_POSTFIX = ".keytab";
 
-  private static final String NAME_REALM_SEPARATOR_STR  = "@";
+  private static final String NAME_REALM_SEPARATOR_STR = "@";
+
+  private KeyTab(String keytab, String userName, SystemEnvironment systemEnvironment)
+      throws IOException {
+
+    String realm = systemEnvironment.getVariable(SystemEnvironment.KRB_REALM);
+    String kdc = systemEnvironment.getVariable(SystemEnvironment.KRB_KDC);
+    KrbLoginManagerFactory.getInstance().getKrbLoginManagerInstance(kdc, realm);
+
+    if (!KerberosName.hasRulesBeenSet()) {
+      KerberosName.setRules(
+          systemEnvironment.getHadoopConfiguration().get(KRB_PRINC_TO_SYS_USER_NAME_RULES));
+    }
+    krbPrincName = new KerberosName(userName.concat(NAME_REALM_SEPARATOR_STR).concat(realm));
+    saveKeytabIfNotExists(keytab);
+  }
 
   public static KeyTab createInstance(String keyTab, String userName) throws IOException {
     return new KeyTab(keyTab, userName, new SystemEnvironment());
@@ -49,23 +64,6 @@ public final class KeyTab {
     return new KeyTab(keyTab, userName, systemEnvironment);
   }
 
-  private KeyTab(String keytab,
-                String userName,
-                SystemEnvironment systemEnvironment) throws IOException {
-
-    String realm = systemEnvironment.getVariable(SystemEnvironment.KRB_REALM);
-    String kdc = systemEnvironment.getVariable(SystemEnvironment.KRB_KDC);
-    KrbLoginManagerFactory.getInstance().getKrbLoginManagerInstance(kdc, realm);
-
-    if (!KerberosName.hasRulesBeenSet()) {
-        KerberosName.setRules(systemEnvironment.getHadoopConfiguration()
-                                        .get(KRB_PRINC_TO_SYS_USER_NAME_RULES));
-    }
-    krbPrincName = new KerberosName(userName.concat(NAME_REALM_SEPARATOR_STR)
-                                            .concat(realm));
-    saveKeytabIfNotExists(keytab);
-  }
-
   public String getFullKeyTabFilePath() throws IOException {
     return KEY_TABS_DIR.concat(krbPrincName.getShortName()).concat(KEY_TAB_FILE_POSTFIX);
   }
@@ -74,13 +72,12 @@ public final class KeyTab {
     String keyTabFilePath = getFullKeyTabFilePath();
     Path path = Paths.get(keyTabFilePath);
     if (Files.notExists(path)) {
-      Files.write(path,
-                  Base64.getDecoder().decode(serializedKeyTab),
-                  StandardOpenOption.CREATE_NEW);
+      Files.write(path, Base64.getDecoder().decode(serializedKeyTab),
+          StandardOpenOption.CREATE_NEW);
     } else if (Files.isDirectory(path)) {
       throw new IOException(
           String.format("Under path %s exists directory. It's path where hdfs superuser keytab "
-                        + "is stored. Please move or delete this directory", keyTabFilePath));
+              + "is stored. Please move or delete this directory", keyTabFilePath));
     }
   }
 }
