@@ -121,7 +121,7 @@ public class HgmGateway implements Authorizable {
     return groupMappingServiceUrl.concat(endpoint);
   }
 
-  private List<String> getUsersFromGroup(String orgId) throws RestClientException {
+  private List<String> getUsersFromGroup(String orgId) {
     return Arrays.asList(restTemplate.getForObject(createUrl(ApiEndpoints.USERS), String[].class, orgId));
   }
 

@@ -102,7 +102,7 @@ class Engine {
     private CompletableFuture<Void> createFutureForMethod(ThrowableAction consumer,
         String authorizableName, String authorizableOperation) {
 
-        return CompletableFuture.completedFuture(null).thenAcceptAsync((x) -> {
+        return CompletableFuture.completedFuture(null).thenAcceptAsync(x -> {
             try {
                 consumer.apply();
                 LOGGER.info(authorizableName + " finished " + authorizableOperation);

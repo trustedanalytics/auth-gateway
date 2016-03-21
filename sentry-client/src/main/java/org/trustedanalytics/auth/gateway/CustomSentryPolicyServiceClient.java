@@ -167,14 +167,15 @@ class CustomSentryPolicyServiceClient {
       return superUser;
     }
 
+    Builder(UserGroupInformation ugi) {
+      this.ugi = ugi;
+    }
+    
     public Builder superUser(String superUser) {
       this.superUser = superUser;
       return this;
     }
 
-    Builder(UserGroupInformation ugi) {
-      this.ugi = ugi;
-    }
 
     public Builder address(String address) {
       this.address = address;

@@ -16,18 +16,18 @@ package org.trustedanalytics.auth.gateway.hdfs;
 import org.apache.hadoop.fs.permission.FsAction;
 import org.apache.hadoop.fs.permission.FsPermission;
 
-enum HdfsPermission {
-  USER_ALL(new FsPermission(FsAction.ALL, FsAction.NONE, FsAction.NONE)),
-  USER_ALL_GROUP_ALL(new FsPermission(FsAction.ALL, FsAction.ALL, FsAction.NONE)),
-  USER_ALL_GROUP_EXECUTE(new FsPermission(FsAction.ALL, FsAction.EXECUTE, FsAction.NONE));
+public class HdfsPermission {
+  public static final FsPermission USER_ALL = new FsPermission(FsAction.ALL, FsAction.NONE, FsAction.NONE);
+  public static final FsPermission USER_ALL_GROUP_ALL = new FsPermission(FsAction.ALL, FsAction.ALL, FsAction.NONE);
+  public static final FsPermission USER_ALL_GROUP_EXECUTE = new FsPermission(FsAction.ALL, FsAction.EXECUTE, FsAction.NONE);
 
   private FsPermission permission;
+  
+  private HdfsPermission(FsPermission permission) {
+    this.permission = permission;
+  }
 
   public FsPermission getPermission() {
     return permission;
-  }
-
-  private HdfsPermission(FsPermission permission) {
-    this.permission = permission;
   }
 }

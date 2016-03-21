@@ -41,7 +41,7 @@ public class FileSystemProvider {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FileSystemProvider.class);
 
-  private final static String HADOOP_DEFAULT_FS = "fs.defaultFS";
+  private static final String HADOOP_DEFAULT_FS = "fs.defaultFS";
 
   private static final String AUTHENTICATION_METHOD = "kerberos";
 

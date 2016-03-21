@@ -40,8 +40,6 @@ class KrbClientConfiguration {
 
   private String keyTabPath;
 
-  private static final String KRB_PRINC_TO_SYS_USER_NAME_RULES = "hadoop.security.auth_to_local";
-
   @PostConstruct
   public void initialize() throws IOException, LoginException {
     SystemEnvironment systemEnvironment = new SystemEnvironment();

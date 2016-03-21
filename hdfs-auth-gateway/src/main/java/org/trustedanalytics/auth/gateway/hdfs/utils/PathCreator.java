@@ -62,7 +62,7 @@ public class PathCreator {
   }
 
   private Path createPath(String... args) {
-    return getPath(Path.SEPARATOR.concat((String.join(Path.SEPARATOR, args))));
+    return getPath(Path.SEPARATOR.concat(String.join(Path.SEPARATOR, args)));
   }
 
   private Path getPath(String relativePath) {

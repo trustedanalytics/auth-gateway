@@ -15,22 +15,17 @@
  */
 package org.trustedanalytics.auth.gateway;
 
+import java.io.IOException;
+
+import javax.security.auth.login.LoginException;
+
 import org.apache.hadoop.security.UserGroupInformation;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.trustedanalytics.hadoop.config.client.Configurations;
-import org.trustedanalytics.hadoop.config.client.Property;
-import org.trustedanalytics.hadoop.config.client.ServiceInstanceConfiguration;
-import org.trustedanalytics.hadoop.kerberos.KrbLoginManager;
-import org.trustedanalytics.hadoop.kerberos.KrbLoginManagerFactory;
 
 import sun.security.krb5.KrbException;
-
-import java.io.IOException;
-
-import javax.security.auth.login.LoginException;
 
 @Configuration
 @ConfigurationProperties("sentry.server")

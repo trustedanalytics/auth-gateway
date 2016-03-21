@@ -36,10 +36,7 @@ public class HgmKerberosConfiguration {
 
   @Bean
   public RestTemplate getHgmKerberosRestClient() throws IOException {
-    KerberosRestTemplate
-        kerberosRestTemplate =
-        new KerberosRestTemplate(
-            KeyTab.createInstance(principalKeyTab, principal).getFullKeyTabFilePath(), principal);
-    return kerberosRestTemplate;
+    return new KerberosRestTemplate(
+        KeyTab.createInstance(principalKeyTab, principal).getFullKeyTabFilePath(), principal);
   }
 }

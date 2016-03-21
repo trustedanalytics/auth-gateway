@@ -59,7 +59,7 @@ public class KerberosfulZookeeperClient implements ZookeeperClient {
           .withACL(singletonList(new ACL(permission.getPerms(), new Id("sasl", username))))
           .forPath(pathOps.makePath(znodePath));
     } catch (KeeperException.NodeExistsException e) {
-      LOGGER.info("Caught: '" + e.getMessage() + "' while creating node. Ensure ACLs are correct:");
+      LOGGER.info("Caught: '" + e.getMessage() + "' while creating node. Ensure ACLs are correct:", e);
       addUserToAcl(znodePath, username, permission);
     }
   }
@@ -69,7 +69,7 @@ public class KerberosfulZookeeperClient implements ZookeeperClient {
     try {
       curatorClient.delete().forPath(pathOps.makePath(znodePath));
     } catch (KeeperException.NoNodeException e) {
-      LOGGER.info("Caught: '" + e.getMessage() + "' while deleting node. Nothing to do.");
+      LOGGER.info("Caught: '" + e.getMessage() + "' while deleting node. Nothing to do.", e);
     }
   }
 
