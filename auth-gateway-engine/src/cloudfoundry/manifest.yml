@@ -10,7 +10,7 @@ applications:
     KRB_PASSWORD: placeholder
     ZK_CLUSTER_URL: placeholder
     HADOOP_PROVIDED_ZIP: placeholder
-    HDFS_SUPERUSER: hdfs
+    HDFS_SUPERUSER: placeholder
     HDFS_KEYTAB: placeholder
     HDFS_HIVEUSER: hive
     HGM_PRINCIPAL: placeholder
