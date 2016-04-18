@@ -24,4 +24,4 @@ applications:
     SENTRY_PRINCIPAL: placeholder
     SENTRY_SUPERUSER: placeholder
     VERSION: ${project.version}
-    SPRING_PROFILES_ACTIVE: cloud,zookeeper-auth-gateway,hdfs-auth-gateway,sentry-auth-gateway
+    SPRING_PROFILES_ACTIVE: placeholder
