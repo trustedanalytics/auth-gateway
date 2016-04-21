@@ -14,13 +14,12 @@
 
 package org.trustedanalytics.auth.gateway.hbase.kerberos;
 
-import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 
+import com.google.common.collect.ImmutableMap;
+
 public final class KerberosHbaseProperties {
-    private static final String KDC_PROPERTY = "kdc";
-    private static final String REALM_PROPERTY = "krealm";
-    private static final String CERT_PROPERTY = "cacert";
+
     private final String kdc;
     private final String realm;
     private final Map<String, Object> credentials;

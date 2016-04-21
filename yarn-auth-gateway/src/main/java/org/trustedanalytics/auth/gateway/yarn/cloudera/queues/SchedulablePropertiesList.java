@@ -65,7 +65,7 @@ public final class SchedulablePropertiesList {
     return propertiesBuilder().scheduleName(scheduleName).weight(weight).build();
   }
 
-  public final static class Resources {
+  public static final class Resources {
 
     private final Integer vcores;
 

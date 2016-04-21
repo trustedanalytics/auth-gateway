@@ -17,8 +17,10 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import com.github.rholder.retry.*;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.HttpClient;
@@ -36,38 +38,22 @@ import org.trustedanalytics.auth.gateway.yarn.cloudera.client.api.entity.*;
 import org.trustedanalytics.auth.gateway.yarn.cloudera.config.ClouderaConfiguration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.rholder.retry.Retryer;
-import com.github.rholder.retry.RetryerBuilder;
-import com.github.rholder.retry.StopStrategies;
-import com.github.rholder.retry.WaitStrategies;
 import com.google.common.base.Predicates;
 
 @Profile("yarn-auth-gateway")
 @Configuration
 public class ApiConnection {
 
-  private final static Logger LOGGER = LoggerFactory.getLogger(ApiConnection.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ApiConnection.class);
 
-  private final static String YARN_SCHEDULED_ALLOCATIONS = "yarn_fs_scheduled_allocations";
+  private static final String YARN_SCHEDULED_ALLOCATIONS = "yarn_fs_scheduled_allocations";
 
-  private final static String YARN_SERVICE_TYPE = "YARN";
+  private static final String YARN_SERVICE_TYPE = "YARN";
 
   @Autowired
   private ClouderaConfiguration configuration;
 
   public YarnScheduledAllocations getConfiguration() throws ConfigurationException {
-    /*
-     * TODO This is the correct implementation, please use it when cloudera will update jackson
-     * dependencies. ServicesResourceV11 serviceResource = getServiceResource(getClusterResource());
-     * ApiServiceConfig yarnService = getYarnService(serviceResource); ApiConfig
-     * yarn_fs_scheduled_allocations = yarnService.getConfigs().stream() .filter(conf ->
-     * conf.getName().equals(YARN_SCHEDULED_ALLOCATIONS)).findAny() .orElseThrow(() -> new
-     * IllegalStateException("ServiceConfiguration malformed"));
-     * 
-     * return new ObjectMapper().readValue(
-     * Optional.ofNullable(yarn_fs_scheduled_allocations.getValue()).orElse(
-     * yarn_fs_scheduled_allocations.getDefaultValue()), YarnScheduledAllocations.class);
-     */
     List<ServiceConfiguration> serviceConfigurationList =
         createRestTemplate().getForObject(getClouderaUrl(ApiEndpoints.CONFIGURATION),
             ApiServiceConfiguration.class, getCluster().getName(), YARN_SERVICE_TYPE).getItems();
@@ -85,16 +71,6 @@ public class ApiConnection {
   }
 
   public void updateConfiguration(String queueConfiguration) throws ConfigurationException {
-    /*
-     * TODO This is the correct implementation, please use it when cloudera will update jackson
-     * dependencies. dependencies. ClustersResourceV11 clusterResource = getClusterResource();
-     * ServicesResourceV11 serviceResource = getServiceResource(clusterResource);
-     * 
-     * ApiServiceConfig apiConfigs = new ApiServiceConfig(); apiConfigs.setConfigs(Arrays.asList(new
-     * ApiConfig("yarn_fs_scheduled_allocations", queueConfiguration.getConfiguration())));
-     * serviceResource.updateServiceConfig("YARN", "Auth-gateway queues update", apiConfigs);
-     * clusterResource.poolsRefresh(getApiCluster(clusterResource).getName());
-     */
     ApiServiceConfiguration serviceConfiguration =
         new ApiServiceConfiguration(Arrays.asList(new ServiceConfiguration(
             YARN_SCHEDULED_ALLOCATIONS, queueConfiguration)));
@@ -110,7 +86,6 @@ public class ApiConnection {
   }
 
   private RestTemplate createRestTemplate() {
-    // TODO Consider SSL
     BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
     credentialsProvider.setCredentials(AuthScope.ANY,
         new UsernamePasswordCredentials(configuration.getUser(), configuration.getPassword()));
@@ -123,6 +98,7 @@ public class ApiConnection {
   private void updateConfigurationWithRetries(Command command, RestTemplate restTemplate, String cluster)
       throws ConfigurationException {
     Callable<Boolean> callable = new Callable<Boolean>() {
+      @Override
       public Boolean call() throws Exception {
         LOGGER.info("Waiting for cloudera update command finish");
         ApiCommand apiCommand =
@@ -142,7 +118,7 @@ public class ApiConnection {
 
     try {
       retryer.call(callable);
-    } catch (Exception e) {
+    } catch (ExecutionException | RetryException e) {
       throw new ConfigurationException("ServiceConfiguration malformed, cannot update Configuration");
     }
   }
@@ -156,23 +132,4 @@ public class ApiConnection {
     return String.format("http://%s:%s%s", configuration.getHost(), configuration.getPort(), path);
   }
 
-  /*
-   * TODO This is the correct implementation, please use it when cloudera will update jackson
-   * dependencies. private ClustersResourceV11 getClusterResource() { RootResourceV11 rootV11 = new
-   * ClouderaManagerClientBuilder().withHost(configuration.getHost())
-   * .withUsernamePassword(configuration.getUser(), configuration.getPassword()).build()
-   * .getRootV11(); return rootV11.getClustersResource(); }
-   * 
-   * private ServicesResourceV11 getServiceResource(ClustersResourceV11 clustersResource) { return
-   * clustersResource.getServicesResource(getApiCluster(clustersResource).getName()); }
-   * 
-   * private ApiCluster getApiCluster(ClustersResourceV11 clustersResource) { return
-   * clustersResource.readClusters(DataView.FULL).get(0); }
-   * 
-   * private ApiServiceConfig getYarnService(ServicesResourceV11 servicesResourceV11) { return
-   * servicesResourceV11.readServiceConfig(YARN_SERVICE_TYPE, DataView.FULL); }
-   * 
-   * private QueueConfiguration parseConfiguration(String value) throws IOException { return new
-   * ObjectMapper().readValue(value, YarnScheduledAllocations.class); }
-   */
 }

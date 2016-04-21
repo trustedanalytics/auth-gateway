@@ -13,8 +13,6 @@
  */
 package org.trustedanalytics.auth.gateway.yarn.cloudera.queues;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import lombok.Builder;
@@ -23,7 +21,6 @@ import lombok.ToString;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.collect.ImmutableList;
 
 @ToString
 @Builder(builderMethodName = "queueBuilder")

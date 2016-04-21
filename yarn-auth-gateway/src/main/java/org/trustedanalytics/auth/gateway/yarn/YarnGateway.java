@@ -25,13 +25,9 @@ import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
 @Configuration
 public class YarnGateway implements Authorizable {
 
-  private final static Logger LOGGER = LoggerFactory.getLogger(YarnGateway.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(YarnGateway.class);
 
-  private final static String NAME = "yarn";
-
-  private final static String SCHEDULER_TYPE = "fair";
-
-  private final static String ACL_TYPE = "*";
+  private static final String NAME = "yarn";
 
   @Autowired
   private YarnApiClient yarnApiClient;

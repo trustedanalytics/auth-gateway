@@ -14,20 +14,20 @@
 
 package org.trustedanalytics.auth.gateway.hbase;
 
-import com.google.protobuf.BlockingRpcChannel;
-import com.google.protobuf.ServiceException;
+import java.io.IOException;
+import java.util.regex.Pattern;
+
 import org.apache.hadoop.hbase.HConstants;
 import org.apache.hadoop.hbase.NamespaceDescriptor;
 import org.apache.hadoop.hbase.client.Connection;
-import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.protobuf.ProtobufUtil;
 import org.apache.hadoop.hbase.protobuf.generated.AccessControlProtos;
 import org.apache.hadoop.hbase.security.access.AccessControlLists;
 import org.apache.hadoop.hbase.security.access.Permission;
 
-import java.io.IOException;
-import java.util.regex.Pattern;
+import com.google.protobuf.BlockingRpcChannel;
+import com.google.protobuf.ServiceException;
 
 public class HBaseClient {
 

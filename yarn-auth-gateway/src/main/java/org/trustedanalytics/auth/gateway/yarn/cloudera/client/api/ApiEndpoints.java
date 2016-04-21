@@ -14,14 +14,15 @@
 package org.trustedanalytics.auth.gateway.yarn.cloudera.client.api;
 
 public class ApiEndpoints {
-  public final static String CLUSTERS = "/api/v11/clusters";
+  public static final String CLUSTERS = "/api/v11/clusters";
 
-  public final static String CONFIGURATION =
+  public static final String CONFIGURATION =
       "/api/v11/clusters/{clusterName}/services/{service}/config";
 
-  public final static String POOLS_REFRESH =
+  public static final String POOLS_REFRESH =
       "/api/v11/clusters/{clusterName}/commands/poolsRefresh";
 
-  public final static String COMMANDS = "/api/v11/clusters/{clusterName}/commands";
+  public static final String COMMANDS = "/api/v11/clusters/{clusterName}/commands";
 
+  private ApiEndpoints() {}
 }

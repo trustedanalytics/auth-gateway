@@ -14,7 +14,8 @@
 
 package org.trustedanalytics.auth.gateway.hbase;
 
-import com.google.protobuf.ServiceException;
+import java.io.IOException;
+
 import org.apache.hadoop.hbase.NamespaceExistException;
 import org.apache.hadoop.hbase.NamespaceNotFoundException;
 import org.apache.hadoop.hbase.client.Connection;
@@ -27,13 +28,13 @@ import org.springframework.context.annotation.Profile;
 import org.trustedanalytics.auth.gateway.spi.Authorizable;
 import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
 
-import java.io.IOException;
+import com.google.protobuf.ServiceException;
 
 @Profile("hbase-auth-gateway")
 @Configuration
 public class HBaseGateway implements Authorizable {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(HBaseGateway.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HBaseGateway.class);
 
     @Autowired
     private Connection connection;

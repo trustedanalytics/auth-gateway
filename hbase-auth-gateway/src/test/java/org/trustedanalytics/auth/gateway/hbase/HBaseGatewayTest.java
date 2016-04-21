@@ -14,7 +14,10 @@
 
 package org.trustedanalytics.auth.gateway.hbase;
 
-import com.google.protobuf.ServiceException;
+import static org.powermock.api.mockito.PowerMockito.doThrow;
+
+import java.io.IOException;
+
 import org.apache.hadoop.hbase.NamespaceExistException;
 import org.apache.hadoop.hbase.NamespaceNotFoundException;
 import org.apache.hadoop.hbase.client.Connection;
@@ -25,15 +28,12 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
 
-import java.io.IOException;
-
-import static org.powermock.api.mockito.PowerMockito.*;
+import com.google.protobuf.ServiceException;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(HBaseClient.class)

@@ -43,11 +43,11 @@ import org.trustedanalytics.hadoop.kerberos.KrbLoginManagerFactory;
 @org.springframework.context.annotation.Configuration
 public class HbaseConfiguration {
 
-  private final static Logger LOGGER = LoggerFactory.getLogger(HbaseConfiguration.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(HbaseConfiguration.class);
 
-  private final static String AUTHENTICATION_METHOD = "kerberos";
+  private static final String AUTHENTICATION_METHOD = "kerberos";
 
-  private final static String AUTHENTICATION_METHOD_PROPERTY = "hbase.security.authentication";
+  private static final String AUTHENTICATION_METHOD_PROPERTY = "hbase.security.authentication";
 
   @Autowired
   private KerberosHbaseProperties kerberosHbaseProperties;
@@ -80,8 +80,7 @@ public class HbaseConfiguration {
         UserProvider.instantiate(hbaseConf).create(
             UserGroupInformation.createRemoteUser(systemEnvironment
                 .getVariable(SystemEnvironment.KRB_USER)));
-    Connection connection = ConnectionFactory.createConnection(conf, user);
-    return connection;
+    return ConnectionFactory.createConnection(conf, user);
   }
 
   private Connection getSecuredHBaseClient(Configuration hbaseConf) throws InterruptedException,
@@ -100,8 +99,6 @@ public class HbaseConfiguration {
     Configuration conf = HBaseConfiguration.create(hbaseConf);
     User user =
         UserProvider.instantiate(conf).create(UserGroupInformation.getUGIFromSubject(subject));
-    Connection connection = ConnectionFactory.createConnection(conf, user);
-
-    return connection;
+    return ConnectionFactory.createConnection(conf, user);
   }
 }

@@ -38,13 +38,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Configuration
 public class YarnClouderaApiClient implements YarnApiClient {
 
-  private final static Logger LOGGER = LoggerFactory.getLogger(YarnApiClient.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(YarnApiClient.class);
 
-  private final static String SCHEDULER_TYPE = "fair";
+  private static final String SCHEDULER_TYPE = "fair";
 
-  private final static String ACL_TYPE = "*";
-
-  private final static String YARN_ROOT_QUEUE_NAME = "root";
+  private static final String ACL_TYPE = "*";
 
   @Autowired
   private ApiConnection apiConnection;

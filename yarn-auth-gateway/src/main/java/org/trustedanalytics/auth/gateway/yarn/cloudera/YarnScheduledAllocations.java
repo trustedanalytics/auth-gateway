@@ -86,16 +86,16 @@ public final class YarnScheduledAllocations implements PoolConfiguration {
   @Override
   @JsonIgnore
   public Queue getRootQueue() throws ConfigurationException {
-    List<Queue> queues = this.getQueues();
-    checkQueueSize(queues);
-    return queues.get(0);
+    List<Queue> queueList = this.getQueues();
+    checkQueueSize(queueList);
+    return queueList.get(0);
   }
 
   private void checkQueueSize(List<Queue> queues) {
-    Preconditions.checkArgument(queues.size() > 0);
+    Preconditions.checkArgument(!queues.isEmpty());
   }
 
-  public final static class QueuePlacementRule {
+  public static final class QueuePlacementRule {
     @Getter
     private final String name;
     @Getter
@@ -109,7 +109,7 @@ public final class YarnScheduledAllocations implements PoolConfiguration {
     }
   }
 
-  public final static class User {
+  public static final class User {
     @Getter
     private final String name;
     @Getter
