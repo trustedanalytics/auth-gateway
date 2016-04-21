@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>auth-gateway</artifactId>
-    <version>0.6.4</version>
+    <version>0.7.0</version>
     <packaging>pom</packaging>
 
     <name>auth-gateway</name>
@@ -14,9 +14,18 @@
         <version>0.5.5</version>
     </parent>
 
+    <repositories>
+        <repository>
+            <id>cdh.repo</id>
+            <url>https://repository.cloudera.com/artifactory/cloudera-repos</url>
+            <name>Cloudera Repository</name>
+        </repository>
+    </repositories>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <hadoop.utils.version>0.5.8</hadoop.utils.version>
+        <jackson.version>2.4.3</jackson.version>
         <brokerStoreVersion>0.5.10</brokerStoreVersion>
         <auth-gateway.version>${version}</auth-gateway.version>
     </properties>
@@ -29,24 +38,26 @@
         <module>hdfs-auth-gateway</module>
         <module>sentry-client</module>
         <module>auth-gateway-commons</module>
+        <module>yarn-auth-gateway</module>
+        <module>hbase-auth-gateway</module>
     </modules>
 
     <dependencies>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
+            <version>16.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-            <exclusions></exclusions>
         </dependency>
 
         <!-- tag::provided[] -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.16.6</version>
+            <version>1.16.8</version>
             <scope>provided</scope>
         </dependency>
         <!-- end::provided[] -->

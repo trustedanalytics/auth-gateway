@@ -21,9 +21,7 @@ import javax.security.auth.login.LoginException;
 
 import org.apache.hadoop.security.UserGroupInformation;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.*;
 
 import sun.security.krb5.KrbException;
 
@@ -38,6 +36,7 @@ class SentryClientConfiguration {
 
   private String principal;
 
+  @Scope(value = "prototype", proxyMode = ScopedProxyMode.TARGET_CLASS)
   @Bean(initMethod = "initialize", destroyMethod = "destroy")
   public CustomSentryPolicyServiceClient sentryPolicyServiceClient(SentryAuthenticator authenticator)
       throws IOException, LoginException, KrbException {

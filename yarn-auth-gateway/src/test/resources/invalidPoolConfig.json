@@ -1,0 +1,19 @@
+{
+  "queuePlacementRules": [
+    {
+      "create": false,
+      "name": "specified"
+    },
+    {
+      "create": false,
+      "name": "user"
+    },
+    {
+      "create": false,
+      "name": "reject"
+    }
+  ],
+  "users": [],
+  "queues": [],
+  "defaultQueueSchedulingPolicy": "drf"
+}

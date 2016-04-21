@@ -29,6 +29,10 @@ public class PathCreator {
 
   private static final String BROKER_USERSPACE = "userspace";
 
+  private static final String OOZIE_JOBS = "oozie-jobs";
+
+  private static final String SQOOP_IMPORTS = "sqoop-imports";
+
   private static final String TMP = "tmp";
 
   private static final String APP = "apps";
@@ -40,6 +44,10 @@ public class PathCreator {
   public Path getUserspacePath(String org) {
     return createPath(ORGS, org, BROKER, BROKER_USERSPACE);
   }
+
+  public Path getOozieJobsPath(String org) { return createPath(ORGS, org, OOZIE_JOBS); }
+
+  public Path getSqoopImportsPath(String org) { return createPath(ORGS, org, SQOOP_IMPORTS); }
 
   public Path getTmpPath(String org) {
     return createPath(ORGS, org, TMP);
@@ -59,6 +67,10 @@ public class PathCreator {
 
   public Path getUserPath(String org, String user) {
     return createPath(ORGS, org, USER, user);
+  }
+
+  public Path getUserHomePath(String user) {
+    return createPath(USER, user);
   }
 
   private Path createPath(String... args) {

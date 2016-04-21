@@ -17,8 +17,11 @@ import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.doThrow;
 import static org.powermock.api.mockito.PowerMockito.when;
 
-import java.io.IOException;
-import java.util.List;
+import org.trustedanalytics.auth.gateway.hdfs.config.ExternalConfiguration;
+import org.trustedanalytics.auth.gateway.hdfs.config.FileSystemProvider;
+import org.trustedanalytics.auth.gateway.hdfs.kerberos.KerberosProperties;
+import org.trustedanalytics.auth.gateway.hdfs.utils.PathCreator;
+import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
 
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -33,11 +36,9 @@ import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.trustedanalytics.auth.gateway.hdfs.config.ExternalConfiguration;
-import org.trustedanalytics.auth.gateway.hdfs.config.FileSystemProvider;
-import org.trustedanalytics.auth.gateway.hdfs.kerberos.KerberosProperties;
-import org.trustedanalytics.auth.gateway.hdfs.utils.PathCreator;
-import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
+
+import java.io.IOException;
+import java.util.List;
 
 // @RunWith(MockitoJUnitRunner.class)
 @RunWith(PowerMockRunner.class)
@@ -54,6 +55,10 @@ public class HdfsGatewayTest {
 
   private static final Path TMP_PATH = new Path("/org/test_org/tmp");
 
+  private static final Path OOZIE_PATH = new Path("/org/test_org/oozie-jobs");
+
+  private static final Path SQOOP_PATH = new Path("/org/test_org/sqoop-imports");
+
   private static final Path BROKER_PATH = new Path("/org/test_org/brokers");
 
   private static final Path BROKER_METADATA_PATH = new Path("/org/test_org/brokers/metadata");
@@ -63,6 +68,8 @@ public class HdfsGatewayTest {
   private static final Path APP_PATH = new Path("/org/test_org/apps");
 
   private static final Path USER_PATH = new Path("/org/test_org/user/test_user");
+
+  private static final Path USER_HOME_PATH = new Path("/user/test_user");
 
   @Mock
   private FileSystem fileSystem;
@@ -110,8 +117,11 @@ public class HdfsGatewayTest {
     when(pathCreator.getUserspacePath("test_org")).thenReturn(BROKER_USERSPACE_PATH);
     when(pathCreator.getTmpPath("test_org")).thenReturn(TMP_PATH);
     when(pathCreator.getAppPath("test_org")).thenReturn(APP_PATH);
+    when(pathCreator.getSqoopImportsPath("test_org")).thenReturn(SQOOP_PATH);
+    when(pathCreator.getOozieJobsPath("test_org")).thenReturn(OOZIE_PATH);
     when(pathCreator.getUsersPath("test_org")).thenReturn(ORG_USERS_PATH);
     when(pathCreator.getUserPath("test_org", "test_user")).thenReturn(USER_PATH);
+    when(pathCreator.getUserHomePath("test_user")).thenReturn(USER_HOME_PATH);
     when(krbProperties.getTechnicalPrincipal()).thenReturn("test_cf");
     when(config.getHiveUser()).thenReturn("test_hive");
     when(config.getArcadiaUser()).thenReturn("test_arcadia");
@@ -167,6 +177,7 @@ public class HdfsGatewayTest {
       throws AuthorizableGatewayException, IOException {
     hdfsGateway.addUserToOrg(USER, ORG);
     verify(hdfsClient).createDirectory(USER_PATH, "test_user", "test_org", userAllOnly);
+    verify(hdfsClient).createDirectory(USER_HOME_PATH, "test_user", "test_org", userAllOnly);
   }
 
   @Test(expected = AuthorizableGatewayException.class)

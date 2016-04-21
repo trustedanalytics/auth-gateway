@@ -13,6 +13,7 @@
  */
 package org.trustedanalytics.auth.gateway.hgm;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.trustedanalytics.auth.gateway.hgm.entity.User;
 import org.trustedanalytics.auth.gateway.hgm.utils.ApiEndpoints;
 import org.trustedanalytics.auth.gateway.hgm.utils.Qualifiers;
@@ -47,6 +48,7 @@ public class HgmGateway implements Authorizable {
   private String groupMappingServiceUrl;
 
   @Autowired
+  @Qualifier("hgmRestTemplate")
   private RestTemplate restTemplate;
 
   @Override

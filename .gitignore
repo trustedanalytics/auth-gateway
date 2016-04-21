@@ -31,4 +31,4 @@ hs_err_pid*
 
 # files created during build for Cloud Foundry app
 auth-gateway-engine/manifest.yml
-
+manifest.yml

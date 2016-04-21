@@ -28,6 +28,7 @@ import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,7 +48,7 @@ public class HgmHttpsConfiguration {
   @Value("${group.mapping.https.password}")
   private String password;
 
-  @Bean
+  @Bean(name = "hgmRestTemplate")
   public RestTemplate getHgmHttpsRestTemplate() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
     SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(null, new TrustSelfSignedStrategy()).useTLS().build();
     SSLConnectionSocketFactory connectionFactory = new SSLConnectionSocketFactory(sslContext, new AllowAllHostnameVerifier());

@@ -13,17 +13,24 @@
  */
 package org.trustedanalytics.auth.gateway.engine;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.trustedanalytics.auth.gateway.engine.Engine;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
 import org.trustedanalytics.auth.gateway.spi.Authorizable;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 @Configuration
 class EngineConfig {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(EngineConfig.class);
 
     @Value("${engine.timeout}")
     private long timeout;
@@ -38,4 +45,15 @@ class EngineConfig {
     public Engine getEngine() {
         return new Engine(supportedAuthorizables, timeout);
     }
+
+    @Bean
+    public Supplier<String> getAccessTokenExtractor() {
+        return () -> {
+            OAuth2Authentication oauth2
+                = (OAuth2Authentication) SecurityContextHolder.getContext().getAuthentication();
+            OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) oauth2.getDetails();
+            return details.getTokenValue();
+        };
+    }
+
 }

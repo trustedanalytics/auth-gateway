@@ -3,6 +3,8 @@ applications:
 - name: auth-gateway
   buildpack: java_buildpack
   path: target/auth-gateway-${project.version}.jar
+  services:
+    - sso
   env:
     KRB_KDC: placeholder
     KRB_REALM: placeholder
@@ -10,6 +12,7 @@ applications:
     KRB_PASSWORD: placeholder
     ZK_CLUSTER_URL: placeholder
     HADOOP_PROVIDED_ZIP: placeholder
+    HBASE_PROVIDED_ZIP: placeholder
     HDFS_SUPERUSER: placeholder
     HDFS_KEYTAB: placeholder
     HDFS_HIVEUSER: hive

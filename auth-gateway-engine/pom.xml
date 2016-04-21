@@ -5,16 +5,16 @@
     <parent>
         <groupId>org.trustedanalytics</groupId>
         <artifactId>auth-gateway</artifactId>
-        <version>0.6.4</version>
+        <version>0.7.0</version>
     </parent>
     <artifactId>auth-gateway-engine</artifactId>
 
     <properties>
         <start-class>org.trustedanalytics.auth.gateway.Application</start-class>
-        <jacoco-measurement-instructions>0.7000</jacoco-measurement-instructions>
+        <jacoco-measurement-instructions>0.8000</jacoco-measurement-instructions>
         <jacoco-measurement-branches>0.7000</jacoco-measurement-branches>
         <jacoco-measurement-lines>0.6000</jacoco-measurement-lines>
-        <jacoco-measurement-classes>0.200</jacoco-measurement-classes>
+        <jacoco-measurement-classes>0.8500</jacoco-measurement-classes>
     </properties>
 
     <dependencies>
@@ -22,6 +22,12 @@
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
             <version>2.3.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.trustedanalytics</groupId>
@@ -36,6 +42,11 @@
         <dependency>
             <groupId>org.trustedanalytics</groupId>
             <artifactId>hdfs-auth-gateway</artifactId>
+            <version>${auth-gateway.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.trustedanalytics</groupId>
+            <artifactId>hbase-auth-gateway</artifactId>
             <version>${auth-gateway.version}</version>
         </dependency>
         <dependency>
@@ -59,6 +70,11 @@
             <version>${auth-gateway.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.trustedanalytics</groupId>
+            <artifactId>yarn-auth-gateway</artifactId>
+            <version>${auth-gateway.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
             <version>4.4.4</version>
@@ -68,10 +84,65 @@
             <artifactId>slf4j-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.jayway.restassured</groupId>
-            <artifactId>rest-assured</artifactId>
-            <version>2.5.0</version>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <version>4.0.3.RELEASE</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security.oauth</groupId>
+            <artifactId>spring-security-oauth2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.bitbucket.b_c</groupId>
+            <artifactId>jose4j</artifactId>
+            <version>0.5.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-jwt</artifactId>
+            <version>1.0.3.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-security</artifactId>
+            <version>1.0.1.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>com.netflix.feign</groupId>
+            <artifactId>feign-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.netflix.feign</groupId>
+            <artifactId>feign-jackson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.netflix.feign</groupId>
+            <artifactId>feign-slf4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.4.0</version>
         </dependency>
     </dependencies>
     <build>

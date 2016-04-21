@@ -5,7 +5,7 @@
     <parent>
         <artifactId>auth-gateway</artifactId>
         <groupId>org.trustedanalytics</groupId>
-        <version>0.6.4</version>
+        <version>0.7.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -22,6 +22,24 @@
             <groupId>org.trustedanalytics</groupId>
             <artifactId>hadoop-utils</artifactId>
             <version>${hadoop.utils.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.hbase</groupId>
+                    <artifactId>hbase-client</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.hbase</groupId>
+                    <artifactId>hbase-common</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-common</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-hdfs</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.security.kerberos</groupId>
@@ -36,6 +54,10 @@
             <groupId>org.trustedanalytics</groupId>
             <artifactId>auth-gateway-commons</artifactId>
             <version>${auth-gateway.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
         </dependency>
     </dependencies>
 

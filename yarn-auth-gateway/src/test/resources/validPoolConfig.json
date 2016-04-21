@@ -1,0 +1,85 @@
+{
+  "queuePlacementRules": [
+    {
+      "create": false,
+      "name": "specified"
+    },
+    {
+      "create": false,
+      "name": "user"
+    },
+    {
+      "create": false,
+      "name": "reject"
+    }
+  ],
+  "users": [],
+  "queues": [
+    {
+      "queues": [
+        {
+          "queues": [],
+          "aclAdministerApps": "*",
+          "aclSubmitApps": "*",
+          "minSharePreemptionTimeout": null,
+          "schedulingPolicy": "fair",
+          "schedulablePropertiesList": [
+            {
+              "weight": 1,
+              "scheduleName": "default"
+            }
+          ],
+          "name": "default"
+        },
+        {
+          "queues": [],
+          "aclAdministerApps": "*",
+          "aclSubmitApps": "hive,cf,vcap hive,intel",
+          "minSharePreemptionTimeout": null,
+          "schedulingPolicy": "fair",
+          "schedulablePropertiesList": [
+            {
+              "weight": 1,
+              "maxResources": {
+                "memory": 4096,
+                "vcores": 20
+              },
+              "minResources": {
+                "memory": 1024,
+                "vcores": 1
+              },
+              "scheduleName": "default"
+            }
+          ],
+          "name": "hive"
+        },
+        {
+          "queues": [],
+          "aclAdministerApps": "*",
+          "aclSubmitApps": "test10 test10",
+          "minSharePreemptionTimeout": null,
+          "schedulingPolicy": "fair",
+          "schedulablePropertiesList": [
+            {
+              "weight": 1,
+              "scheduleName": "default"
+            }
+          ],
+          "name": "test10"
+        }
+      ],
+      "aclAdministerApps": "*",
+      "aclSubmitApps": " intel,hdfs,mapred,hue,hive",
+      "minSharePreemptionTimeout": null,
+      "schedulingPolicy": "fair",
+      "schedulablePropertiesList": [
+        {
+          "weight": 1,
+          "scheduleName": "default"
+        }
+      ],
+      "name": "root"
+    }
+  ],
+  "defaultQueueSchedulingPolicy": "drf"
+}

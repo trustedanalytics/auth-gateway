@@ -5,7 +5,7 @@
     <parent>
         <artifactId>auth-gateway</artifactId>
         <groupId>org.trustedanalytics</groupId>
-        <version>0.6.4</version>
+        <version>0.7.0</version>
     </parent>
     <artifactId>auth-gateway-commons</artifactId>
     <name>auth-gateway-commons</name>
@@ -51,6 +51,14 @@
                     <artifactId>hadoop-common</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hbase</groupId>
+                    <artifactId>hbase-client</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.hbase</groupId>
+                    <artifactId>hbase-common</artifactId>
+                </exclusion>
+                <exclusion>
                     <artifactId>powermock-release-with-junit-mockito-dependencies</artifactId>
                     <groupId>org.powermock</groupId>
                 </exclusion>
@@ -76,6 +84,10 @@
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

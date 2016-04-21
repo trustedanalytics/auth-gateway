@@ -15,14 +15,16 @@ package org.trustedanalytics.auth.gateway.engine.integration.tests;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.trustedanalytics.auth.gateway.spi.Authorizable;
 
 @Configuration
+@PropertySource("classpath:application-test.yml")
 public class TestConfiguration {
-    
+
     @Bean
-    public Authorizable authorizable(){
+    public Authorizable authorizable() {
         return new FilesystemTestAuthorizable();
     }
-    
+
 }

@@ -34,7 +34,7 @@ public class HgmKerberosConfiguration {
   @Value("${group.mapping.kerberos.principalKeyTab}")
   private String principalKeyTab;
 
-  @Bean
+  @Bean(name = "hgmRestTemplate")
   public RestTemplate getHgmKerberosRestClient() throws IOException {
     return new KerberosRestTemplate(
         KeyTab.createInstance(principalKeyTab, principal).getFullKeyTabFilePath(), principal);

@@ -1,13 +1,19 @@
 security:
     ignored: /v2/api-docs
 engine:
-  timeout: 10
+  timeout: 30
 hdfs:
   superUser: ${hdfs.superuser:}
   clientKeytab: ${hdfs.keytab:}
   hiveUser: ${hdfs.hiveuser:}
   arcadiaUser: ${hdfs.arcadiauser:arcadia-user}
   vcapUser: ${hdfs.vcapuser:vcap}
+yarn:
+  cloudera:
+    user: ${cloudera.user:}
+    password: ${cloudera.password:}
+    host: ${cloudera.address:}
+    port: ${cloudera.port:}
 group.mapping:
   url: ${hgm.url}
   kerberos:
@@ -23,5 +29,13 @@ sentry.server:
 sentry.client:
   clientKeyTab: ${sentry.keytab:}
   superUser: ${sentry.superuser:hive}
+spring.oauth2.resource:
+    id: cloud_controller
+    jwt:
+      keyUri: ${vcap.services.sso.credentials.tokenKey}
+logging.level:
+    org.apache.zookeeper: DEBUG
+    org.trustedanalytics: DEBUG
+
 
 logging.level.org.apache.zookeeper: DEBUG
