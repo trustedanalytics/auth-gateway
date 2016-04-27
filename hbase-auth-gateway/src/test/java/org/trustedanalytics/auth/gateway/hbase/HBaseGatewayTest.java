@@ -40,90 +40,79 @@ import com.google.protobuf.ServiceException;
 @PrepareForTest(HBaseClient.class)
 public class HBaseGatewayTest {
 
-    private static final String ORG = "test-org-id";
+  private static final String ORG = "test-org-id";
 
-    private static final String ORG_NAMESPACE = "testorgid";
+  private static final String ORG_NAMESPACE = "testorgid";
 
-    private static final String ORG_GROUP = "@test-org-id";
+  private static final String ORG_GROUP = "@test-org-id";
 
-    @Mock
-    private Connection connection;
+  @Mock
+  private Connection connection;
 
-    @Mock
-    private HBaseClient hBaseClient;
+  @Mock
+  private HBaseClient hBaseClient;
 
-    @InjectMocks
-    private HBaseGateway hBaseGateway;
+  @InjectMocks
+  private HBaseGateway hBaseGateway;
 
-    @Before
-    public void init() throws IOException {
-        PowerMockito.spy(HBaseClient.class);
-        PowerMockito.when(HBaseClient.getNewInstance(connection)).thenReturn(hBaseClient);
-    }
+  @Before
+  public void init() throws IOException {
+    PowerMockito.spy(HBaseClient.class);
+    PowerMockito.when(HBaseClient.getNewInstance(connection)).thenReturn(hBaseClient);
+  }
 
-    @Test
-    public void addOrganization_creationSuccess() throws AuthorizableGatewayException, IOException, ServiceException {
-        hBaseGateway.addOrganization(ORG);
+  @Test
+  public void addOrganization_creationSuccess()
+      throws AuthorizableGatewayException, IOException, ServiceException {
+    hBaseGateway.addOrganization(ORG);
 
-        Mockito.verify(hBaseClient).createNamespace(ORG_NAMESPACE);
-        Mockito.verify(hBaseClient).grandPremisionOnNamespace(ORG_GROUP, ORG_NAMESPACE, Permission.Action.CREATE);
-    }
+    Mockito.verify(hBaseClient).createNamespace(ORG_NAMESPACE);
+    Mockito.verify(hBaseClient).grandPremisionOnNamespace(ORG_GROUP, ORG_NAMESPACE,
+        Permission.Action.CREATE);
+  }
 
-    @Test
-    public void addOrganization_createNamespaceThrowNamespaceExistException()
-            throws AuthorizableGatewayException, IOException, ServiceException {
+  @Test(expected = AuthorizableGatewayException.class)
+  public void addOrganization_createNamespaceThrowIOException()
+      throws AuthorizableGatewayException, IOException, ServiceException {
 
-        doThrow(new NamespaceExistException()).when(hBaseClient).createNamespace(ORG_NAMESPACE);
-        doReturn(true).when(hBaseClient).checkNamespaceExists(ORG_NAMESPACE);
+    doThrow(new IOException()).when(hBaseClient).createNamespace(ORG_NAMESPACE);
 
-        hBaseGateway.addOrganization(ORG);
+    hBaseGateway.addOrganization(ORG);
+  }
 
-        Mockito.verify(hBaseClient, Mockito.times(0)).createNamespace(ORG_NAMESPACE);
-        Mockito.verify(hBaseClient).grandPremisionOnNamespace(ORG_GROUP, ORG_NAMESPACE, Permission.Action.CREATE);
-    }
+  @Test(expected = AuthorizableGatewayException.class)
+  public void addOrganization_grandPremisionOnNamespaceThrowServiceException()
+      throws AuthorizableGatewayException, IOException, ServiceException {
 
-    @Test(expected = AuthorizableGatewayException.class)
-    public void addOrganization_createNamespaceThrowIOException()
-            throws AuthorizableGatewayException, IOException, ServiceException {
+    doThrow(new ServiceException("")).when(hBaseClient).grandPremisionOnNamespace(ORG_GROUP,
+        ORG_NAMESPACE, Permission.Action.CREATE);
 
-        doThrow(new IOException()).when(hBaseClient).createNamespace(ORG_NAMESPACE);
+    hBaseGateway.addOrganization(ORG);
+  }
 
-        hBaseGateway.addOrganization(ORG);
-    }
+  @Test
+  public void removeOrganization_Success() throws AuthorizableGatewayException, IOException {
+    hBaseGateway.removeOrganization(ORG);
 
-    @Test(expected = AuthorizableGatewayException.class)
-    public void addOrganization_grandPremisionOnNamespaceThrowServiceException()
-            throws AuthorizableGatewayException, IOException, ServiceException {
+    Mockito.verify(hBaseClient).removeNamespace(ORG_NAMESPACE);
+  }
 
-        doThrow(new ServiceException("")).when(hBaseClient).grandPremisionOnNamespace(
-                ORG_GROUP, ORG_NAMESPACE, Permission.Action.CREATE);
+  @Test
+  public void removeOrganization_removeNamespaceThrowNamespaceNotFoundException()
+      throws AuthorizableGatewayException, IOException {
+    doThrow(new NamespaceNotFoundException()).when(hBaseClient).removeNamespace(ORG_NAMESPACE);
 
-        hBaseGateway.addOrganization(ORG);
-    }
+    hBaseGateway.removeOrganization(ORG);
 
-    @Test
-    public void removeOrganization_Success() throws AuthorizableGatewayException, IOException {
-        hBaseGateway.removeOrganization(ORG);
+    Mockito.verify(hBaseClient).removeNamespace(ORG_NAMESPACE);
+  }
 
-        Mockito.verify(hBaseClient).removeNamespace(ORG_NAMESPACE);
-    }
+  @Test(expected = AuthorizableGatewayException.class)
+  public void removeOrganization_removeNamespaceThrowIOException()
+      throws AuthorizableGatewayException, IOException {
+    doThrow(new IOException()).when(hBaseClient).removeNamespace(ORG_NAMESPACE);
 
-    @Test
-    public void removeOrganization_removeNamespaceThrowNamespaceNotFoundException()
-            throws AuthorizableGatewayException, IOException {
-        doThrow(new NamespaceNotFoundException()).when(hBaseClient).removeNamespace(ORG_NAMESPACE);
-
-        hBaseGateway.removeOrganization(ORG);
-
-        Mockito.verify(hBaseClient).removeNamespace(ORG_NAMESPACE);
-    }
-
-    @Test(expected = AuthorizableGatewayException.class)
-    public void removeOrganization_removeNamespaceThrowIOException()
-            throws AuthorizableGatewayException, IOException {
-        doThrow(new IOException()).when(hBaseClient).removeNamespace(ORG_NAMESPACE);
-
-        hBaseGateway.removeOrganization(ORG);
-    }
+    hBaseGateway.removeOrganization(ORG);
+  }
 
 }

@@ -1,0 +1,3 @@
+hbase:
+  provided:
+    zip: test-zip

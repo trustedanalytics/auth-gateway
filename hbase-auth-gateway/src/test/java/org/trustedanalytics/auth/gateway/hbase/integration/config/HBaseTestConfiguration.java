@@ -12,28 +12,34 @@
  * the License.
  */
 
-package org.trustedanalytics.auth.gateway.hbase.config;
+package org.trustedanalytics.auth.gateway.hbase.integration.config;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 
+import org.apache.hadoop.hbase.HBaseTestingUtility;
+import org.apache.hadoop.hbase.client.Connection;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
-import org.trustedanalytics.auth.gateway.SystemEnvironment;
+import org.springframework.test.context.ActiveProfiles;
 import org.trustedanalytics.auth.gateway.hbase.kerberos.KerberosHbaseProperties;
 
-@Profile("hbase-auth-gateway")
+@ActiveProfiles("test")
 @Configuration
-public class KerberosHbaseConfiguration {
+public class HBaseTestConfiguration {
 
-    @Profile("!test")
-    @Bean
-    public KerberosHbaseProperties getKerberosHbaseProperties() throws IOException {
-        SystemEnvironment systemEnvironment = new SystemEnvironment();
-        String kdc = systemEnvironment.getVariable(SystemEnvironment.KRB_KDC);
-        String realm = systemEnvironment.getVariable(SystemEnvironment.KRB_REALM);
+  @Autowired
+  private HBaseTestingUtility utility;
 
-        return new KerberosHbaseProperties(kdc, realm);
-    }
+  @Bean
+  public KerberosHbaseProperties getKerberosProperties() throws IOException {
+    return new KerberosHbaseProperties("kdc", "krealm");
+  }
 
+  @Bean
+  public Connection getHBaseConnection()
+      throws IOException, InterruptedException, URISyntaxException {
+    return utility.getConnection();
+  }
 }
