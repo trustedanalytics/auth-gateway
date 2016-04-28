@@ -2,7 +2,7 @@
 applications:
 - name: auth-gateway
   buildpack: java_buildpack
-  path: target/auth-gateway-0.7.1.jar
+  path: target/auth-gateway-0.7.2.jar
   services:
     - sso
   env:
@@ -13,7 +13,7 @@ applications:
     ZK_CLUSTER_URL: placeholder
     HADOOP_PROVIDED_ZIP: placeholder
     HBASE_PROVIDED_ZIP: placeholder
-    HDFS_SUPERUSER: hdfs
+    HDFS_SUPERUSER: placeholder
     HDFS_KEYTAB: placeholder
     HDFS_HIVEUSER: hive
     HGM_PRINCIPAL: placeholder
@@ -26,5 +26,5 @@ applications:
     SENTRY_PORT: placeholder
     SENTRY_PRINCIPAL: placeholder
     SENTRY_SUPERUSER: placeholder
-    VERSION: 0.7.1
+    VERSION: 0.7.2
     SPRING_PROFILES_ACTIVE: placeholder
