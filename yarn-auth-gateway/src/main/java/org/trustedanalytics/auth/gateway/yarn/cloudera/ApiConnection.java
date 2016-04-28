@@ -112,14 +112,14 @@ public class ApiConnection {
         .retryIfResult(Predicates.equalTo(false))
         .retryIfExceptionOfType(IOException.class)
         .retryIfException()
-        .withWaitStrategy(WaitStrategies.incrementingWait(5, TimeUnit.SECONDS, -1, TimeUnit.SECONDS))
-        .withStopStrategy(StopStrategies.stopAfterAttempt(4))
+        .withWaitStrategy(WaitStrategies.incrementingWait(7, TimeUnit.SECONDS, -1, TimeUnit.SECONDS))
+        .withStopStrategy(StopStrategies.stopAfterAttempt(6))
         .build();
 
     try {
       retryer.call(callable);
     } catch (ExecutionException | RetryException e) {
-      throw new ConfigurationException("ServiceConfiguration malformed, cannot update Configuration");
+      throw new ConfigurationException("ServiceConfiguration malformed, cannot update Configuration", e);
     }
   }
 
