@@ -2,7 +2,7 @@
 applications:
 - name: auth-gateway
   buildpack: java_buildpack
-  path: target/auth-gateway-0.7.2.jar
+  path: target/auth-gateway-0.7.3.jar
   services:
     - sso
   env:
@@ -21,10 +21,13 @@ applications:
     HGM_URL: placeholder
     HGM_USERNAME: placeholder
     HGM_PASSWORD: placeholder
-    SENTRY_KEYTAB: placeholder
+    WAREHOUSE_SUPERUSER: placeholder
+    WAREHOUSE_KEYTAB: placeholder
+    HIVE_CONNECTIONURL: placeholder
+    IMPALA_CONNECTIONURL: placeholder
+    IMPALA_AVAILABLE: placeholder
     SENTRY_ADDRESS: placeholder
     SENTRY_PORT: placeholder
     SENTRY_PRINCIPAL: placeholder
-    SENTRY_SUPERUSER: placeholder
-    VERSION: 0.7.2
+    VERSION: 0.7.3
     SPRING_PROFILES_ACTIVE: placeholder

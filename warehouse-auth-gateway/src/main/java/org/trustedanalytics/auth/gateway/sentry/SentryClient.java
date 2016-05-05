@@ -1,20 +1,19 @@
 /**
  * Copyright (c) 2015 Intel Corporation
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
-package org.trustedanalytics.auth.gateway;
+package org.trustedanalytics.auth.gateway.sentry;
 
+import java.io.Closeable;
 import java.io.IOException;
 
 import org.apache.hadoop.security.SaslRpcServer;
@@ -23,7 +22,15 @@ import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.sentry.SentryUserException;
 import org.apache.sentry.provider.db.SentryAlreadyExistsException;
 import org.apache.sentry.provider.db.generic.service.thrift.SentryGenericServiceClient;
-import org.apache.sentry.provider.db.service.thrift.*;
+import org.apache.sentry.provider.db.service.thrift.SentryPolicyService;
+import org.apache.sentry.provider.db.service.thrift.SentryPolicyStoreProcessor;
+import org.apache.sentry.provider.db.service.thrift.TAlterSentryRoleAddGroupsRequest;
+import org.apache.sentry.provider.db.service.thrift.TAlterSentryRoleAddGroupsResponse;
+import org.apache.sentry.provider.db.service.thrift.TCreateSentryRoleRequest;
+import org.apache.sentry.provider.db.service.thrift.TCreateSentryRoleResponse;
+import org.apache.sentry.provider.db.service.thrift.TDropSentryRoleRequest;
+import org.apache.sentry.provider.db.service.thrift.TDropSentryRoleResponse;
+import org.apache.sentry.provider.db.service.thrift.TSentryGroup;
 import org.apache.sentry.service.thrift.ServiceConstants;
 import org.apache.sentry.service.thrift.Status;
 import org.apache.thrift.TException;
@@ -40,10 +47,9 @@ import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
-class CustomSentryPolicyServiceClient {
+public class SentryClient implements Closeable {
 
-  private static final Logger LOGGER =
-      LoggerFactory.getLogger(CustomSentryPolicyServiceClient.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(SentryClient.class);
 
   public static final String HOST_PLACEHOLDER = "/_HOST@";
 
@@ -59,18 +65,13 @@ class CustomSentryPolicyServiceClient {
   private  TTransport transport;
   private UserGroupInformation ugi;
 
-  public CustomSentryPolicyServiceClient(Builder builder) throws IOException {
+  public SentryClient(Builder builder) throws IOException {
     this.address = builder.getAddress();
     this.port = builder.getPort();
     this.principal = builder.getPrincipal();
     this.realm = builder.getRealm();
     this.ugi = builder.getUgi();
     this.superUser = builder.getSuperUser();
-  }
-
-  public void initialize() throws IOException {
-    Preconditions.checkState(client == null && transport == null,
-                             "SentryPolicyServiceClient already initialized!");
 
     // Resolve server host in the same way as they are doing on server side
     String sentryPrincipalPattern = principal + HOST_PLACEHOLDER + realm;
@@ -99,7 +100,7 @@ class CustomSentryPolicyServiceClient {
     client = new SentryPolicyService.Client(protocol);
   }
 
-  public void destroy() {
+  public void close() {
     if (transport != null && transport.isOpen()) {
       transport.close();
     }
@@ -217,8 +218,8 @@ class CustomSentryPolicyServiceClient {
       return ugi;
     }
 
-    CustomSentryPolicyServiceClient build() throws IOException {
-      return new CustomSentryPolicyServiceClient(this);
+    SentryClient build() throws IOException {
+      return new SentryClient(this);
     }
 
   }

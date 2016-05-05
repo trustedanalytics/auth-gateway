@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.trustedanalytics</groupId>
         <artifactId>auth-gateway</artifactId>
-        <version>0.7.2</version>
+        <version>0.7.3</version>
     </parent>
     <artifactId>auth-gateway-engine</artifactId>
 
@@ -66,7 +66,7 @@
         </dependency>
         <dependency>
             <groupId>org.trustedanalytics</groupId>
-            <artifactId>sentry-client</artifactId>
+            <artifactId>warehouse-auth-gateway</artifactId>
             <version>${auth-gateway.version}</version>
         </dependency>
         <dependency>

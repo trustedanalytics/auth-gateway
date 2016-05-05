@@ -2,13 +2,13 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>sentry-client</artifactId>
-    <name>sentry-client</name>
+    <artifactId>warehouse-auth-gateway</artifactId>
+    <name>warehouse-auth-gateway</name>
 
     <parent>
         <groupId>org.trustedanalytics</groupId>
         <artifactId>auth-gateway</artifactId>
-        <version>0.7.2</version>
+        <version>0.7.3</version>
     </parent>
 
     <dependencies>
@@ -114,6 +114,33 @@
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hive</groupId>
+            <artifactId>hive-jdbc</artifactId>
+            <version>${hive.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>slf4j-log4j12</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jetty-all</artifactId>
+                    <groupId>org.eclipse.jetty.aggregate</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hive-shims-0.20S</artifactId>
+                    <groupId>org.apache.hive.shims</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jetty</artifactId>
+                    <groupId>org.mortbay.jetty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hive-exec</artifactId>
+                    <groupId>org.apache.hive</groupId>
                 </exclusion>
             </exclusions>
         </dependency>

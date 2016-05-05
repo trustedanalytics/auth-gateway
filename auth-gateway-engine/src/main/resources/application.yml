@@ -26,9 +26,15 @@ sentry.server:
   address: ${sentry.address:}
   port: ${sentry.port:8038}
   principal: ${sentry.principal:sentry}
-sentry.client:
-  clientKeyTab: ${sentry.keytab:}
-  superUser: ${sentry.superuser:hive}
+impala.server:
+  connectionUrl: ${impala.connectionUrl:}
+  available: ${impala.available}
+hive.server:
+  connectionUrl: ${hive.connectionUrl}
+  hdfsUri: ${hive.hdfsUri:hdfs://nameservice1/org/}
+warehouse.client:
+  clientKeyTab: ${warehouse.keytab:}
+  superUser: ${warehouse.superuser:hive}
 spring.oauth2.resource:
     id: cloud_controller
     jwt:
@@ -36,6 +42,5 @@ spring.oauth2.resource:
 logging.level:
     org.apache.zookeeper: DEBUG
     org.trustedanalytics: DEBUG
-
 
 logging.level.org.apache.zookeeper: DEBUG

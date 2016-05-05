@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>auth-gateway</artifactId>
-    <version>0.7.2</version>
+    <version>0.7.3</version>
     <packaging>pom</packaging>
 
     <name>auth-gateway</name>
@@ -28,6 +28,7 @@
         <jackson.version>2.4.3</jackson.version>
         <brokerStoreVersion>0.5.10</brokerStoreVersion>
         <auth-gateway.version>${version}</auth-gateway.version>
+        <hive.version>0.13.1</hive.version>
     </properties>
 
     <modules>
@@ -36,7 +37,7 @@
         <module>zookeeper-auth-gateway</module>
         <module>group-mapping-gateway</module>
         <module>hdfs-auth-gateway</module>
-        <module>sentry-client</module>
+        <module>warehouse-auth-gateway</module>
         <module>auth-gateway-commons</module>
         <module>yarn-auth-gateway</module>
         <module>hbase-auth-gateway</module>
