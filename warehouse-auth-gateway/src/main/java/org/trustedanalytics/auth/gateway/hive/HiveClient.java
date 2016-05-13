@@ -50,6 +50,7 @@ public class HiveClient implements Closeable {
     });
   }
 
+  @Override
   public void close() throws IOException {
     try {
       if (client != null && !client.isClosed()) {

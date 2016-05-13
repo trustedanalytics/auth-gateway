@@ -17,9 +17,12 @@ import org.apache.hadoop.fs.permission.FsAction;
 import org.apache.hadoop.fs.permission.FsPermission;
 
 public class HdfsPermission {
-  public static final FsPermission USER_ALL = new FsPermission(FsAction.ALL, FsAction.NONE, FsAction.NONE);
-  public static final FsPermission USER_ALL_GROUP_ALL = new FsPermission(FsAction.ALL, FsAction.ALL, FsAction.NONE);
-  public static final FsPermission USER_ALL_GROUP_EXECUTE = new FsPermission(FsAction.ALL, FsAction.EXECUTE, FsAction.NONE);
+  public static final HdfsPermission USER_ALL =
+      new HdfsPermission(new FsPermission(FsAction.ALL, FsAction.NONE, FsAction.NONE));
+  public static final HdfsPermission USER_ALL_GROUP_ALL =
+      new HdfsPermission(new FsPermission(FsAction.ALL, FsAction.ALL, FsAction.NONE));
+  public static final HdfsPermission USER_ALL_GROUP_EXECUTE =
+      new HdfsPermission(new FsPermission(FsAction.ALL, FsAction.EXECUTE, FsAction.NONE));
 
   private FsPermission permission;
   

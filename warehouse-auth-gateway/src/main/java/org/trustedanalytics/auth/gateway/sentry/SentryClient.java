@@ -100,6 +100,7 @@ public class SentryClient implements Closeable {
     client = new SentryPolicyService.Client(protocol);
   }
 
+  @Override
   public void close() {
     if (transport != null && transport.isOpen()) {
       transport.close();
@@ -164,14 +165,15 @@ public class SentryClient implements Closeable {
     private String realm;
     private UserGroupInformation ugi;
     private String superUser;
-    public String getSuperUser() {
-      return superUser;
-    }
 
     Builder(UserGroupInformation ugi) {
       this.ugi = ugi;
     }
-    
+
+    public String getSuperUser() {
+      return superUser;
+    }
+
     public Builder superUser(String superUser) {
       this.superUser = superUser;
       return this;

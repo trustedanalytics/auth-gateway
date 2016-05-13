@@ -13,21 +13,10 @@
  */
 package org.trustedanalytics.auth.gateway.sentry;
 
-import java.io.IOException;
-
-import javax.security.auth.login.LoginException;
-
-import org.apache.hadoop.security.UserGroupInformation;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
-import org.trustedanalytics.auth.gateway.configuration.Authenticator;
 import org.trustedanalytics.auth.gateway.utils.Qualifiers;
-
-import sun.security.krb5.KrbException;
 
 @Configuration
 @ConfigurationProperties("sentry.server")

@@ -30,8 +30,6 @@ import java.util.function.Supplier;
 @Configuration
 class EngineConfig {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(EngineConfig.class);
-
     @Value("${engine.timeout}")
     private long timeout;
 

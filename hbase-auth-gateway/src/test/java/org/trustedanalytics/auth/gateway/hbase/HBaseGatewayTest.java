@@ -14,6 +14,7 @@
 
 package org.trustedanalytics.auth.gateway.hbase;
 
+import static org.powermock.api.mockito.PowerMockito.doReturn;
 import static org.powermock.api.mockito.PowerMockito.doThrow;
 
 import java.io.IOException;
@@ -73,10 +74,11 @@ public class HBaseGatewayTest {
             throws AuthorizableGatewayException, IOException, ServiceException {
 
         doThrow(new NamespaceExistException()).when(hBaseClient).createNamespace(ORG_NAMESPACE);
+        doReturn(true).when(hBaseClient).checkNamespaceExists(ORG_NAMESPACE);
 
         hBaseGateway.addOrganization(ORG);
 
-        Mockito.verify(hBaseClient).createNamespace(ORG_NAMESPACE);
+        Mockito.verify(hBaseClient, Mockito.times(0)).createNamespace(ORG_NAMESPACE);
         Mockito.verify(hBaseClient).grandPremisionOnNamespace(ORG_GROUP, ORG_NAMESPACE, Permission.Action.CREATE);
     }
 

@@ -16,4 +16,6 @@ package org.trustedanalytics.auth.gateway.hdfs.utils;
 public final class Qualifiers {
   public static final String HDFS = "hdfs-auth-gateway";
   public static final String TEST_EXCLUDE = "!test";
+
+  private Qualifiers() {}
 }

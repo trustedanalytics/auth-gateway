@@ -102,9 +102,9 @@ public class HdfsGatewayTest {
 
   @Before
   public void init() throws IOException {
-    userAllOnly = HdfsPermission.USER_ALL;
-    usrAllGroupAll = HdfsPermission.USER_ALL_GROUP_ALL;
-    usrAllGroupExec = HdfsPermission.USER_ALL_GROUP_EXECUTE;
+    userAllOnly = HdfsPermission.USER_ALL.getPermission();
+    usrAllGroupAll = HdfsPermission.USER_ALL_GROUP_ALL.getPermission();
+    usrAllGroupExec = HdfsPermission.USER_ALL_GROUP_EXECUTE.getPermission();
 
     when(fileSystemProvider.getFileSystem()).thenReturn(fileSystem);
     PowerMockito.spy(HdfsClient.class);

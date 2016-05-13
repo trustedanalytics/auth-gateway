@@ -54,6 +54,7 @@ public class ImpalaClient implements Closeable {
 
   public boolean isAvailable() { return available; }
 
+  @Override
   public void close() throws IOException {
     try {
       if (client != null && !client.isClosed()) {

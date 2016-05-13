@@ -46,6 +46,15 @@ public class HBaseClient {
         connection.getAdmin().createNamespace(descriptor);
     }
 
+    public boolean checkNamespaceExists(String name) throws IOException{
+        for(NamespaceDescriptor namespace:connection.getAdmin().listNamespaceDescriptors())
+        {
+            if(namespace.getName().equals(name))
+                return true;
+        }
+        return false;
+    }
+
     public void grandPremisionOnNamespace(String user, String namespace, Permission.Action permission) throws IOException, ServiceException {
       try (Table acl = connection.getTable(AccessControlLists.ACL_TABLE_NAME)) {
             BlockingRpcChannel service = acl.coprocessorService(HConstants.EMPTY_START_ROW);

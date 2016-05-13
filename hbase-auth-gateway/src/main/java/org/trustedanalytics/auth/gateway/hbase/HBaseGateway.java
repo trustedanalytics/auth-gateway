@@ -44,11 +44,9 @@ public class HBaseGateway implements Authorizable {
         HBaseClient hBaseClient = HBaseClient.getNewInstance(connection);
         String namespaceName = orgId.replace("-", "");
         try {
-            try {
+            if(!hBaseClient.checkNamespaceExists(namespaceName))
                 hBaseClient.createNamespace(namespaceName);
-            } catch (NamespaceExistException e) {
-                LOGGER.warn("Unable to create namespace. Namespace named: " + namespaceName + " already exist.");
-            }
+
             String user = "@".concat(orgId);
             hBaseClient.grandPremisionOnNamespace(user, namespaceName, Permission.Action.CREATE);
         } catch (IOException | ServiceException e) {

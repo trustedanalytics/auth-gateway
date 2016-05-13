@@ -56,8 +56,8 @@ public class HdfsGateway implements Authorizable {
 
   @Override
   public void addOrganization(String orgId) throws AuthorizableGatewayException {
-    FsPermission usrAllGroupAll = HdfsPermission.USER_ALL_GROUP_ALL;
-    FsPermission usrAllGroupExec = HdfsPermission.USER_ALL_GROUP_EXECUTE;
+    FsPermission usrAllGroupAll = HdfsPermission.USER_ALL_GROUP_ALL.getPermission();
+    FsPermission usrAllGroupExec = HdfsPermission.USER_ALL_GROUP_EXECUTE.getPermission();
     List<AclEntry> defaultWithKrbTechUserExec =
         getDefaultAclWithKrbTechUserAction(FsAction.EXECUTE, FsAction.EXECUTE);
     List<AclEntry> defaultWithTechUserAll =
@@ -102,11 +102,11 @@ public class HdfsGateway implements Authorizable {
     try {
       final HdfsClient hdfsClient = HdfsClient.getNewInstance(fileSystemProvider.getFileSystem());
       hdfsClient.createDirectory(paths.getUserPath(orgId, userId), userId, orgId,
-          HdfsPermission.USER_ALL);
+          HdfsPermission.USER_ALL.getPermission());
 
       // user home directory is required by hadoop components (e.g. oozie) to store temporary files
       hdfsClient.createDirectory(paths.getUserHomePath(userId), userId, orgId,
-          HdfsPermission.USER_ALL);
+          HdfsPermission.USER_ALL.getPermission());
     } catch (IOException e) {
       throw new AuthorizableGatewayException(String.format("Can't add user: %s", userId), e);
     }
