@@ -47,6 +47,8 @@ public class HdfsGatewayTest {
 
   private static final String USER = "test_user";
 
+  private static final String SYS_GROUP = "test_org_sys";
+
   private static final Path ORG_PATH = new Path("/org/test_org");
 
   private static final Path ORG_USERS_PATH = new Path("/org/test_org/user");
@@ -126,9 +128,9 @@ public class HdfsGatewayTest {
     when(config.getVcapUser()).thenReturn("test_vcap");
 
     defaultWithTechUserExec =
-        hdfsGateway.getDefaultAclWithKrbTechUserAction(FsAction.EXECUTE, FsAction.EXECUTE);
+        hdfsGateway.getDefaultAclWithKrbTechUserAction(FsAction.EXECUTE, FsAction.EXECUTE, SYS_GROUP);
     defaultWithTechUserAll =
-        hdfsGateway.getDefaultAclWithKrbTechUserAction(FsAction.ALL, FsAction.ALL);
+        hdfsGateway.getDefaultAclWithKrbTechUserAction(FsAction.ALL, FsAction.ALL, SYS_GROUP);
   }
 
   @Test

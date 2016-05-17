@@ -42,6 +42,8 @@ public class HgmGateway implements Authorizable {
 
   private static final String ADMIN_POSTFIX = "_admin";
 
+  private static final String TECH_GROUP_POSTFIX = "_sys";
+
   private static final String NAME = "hgm";
 
   @Value("${group.mapping.url}")
@@ -58,6 +60,9 @@ public class HgmGateway implements Authorizable {
       if (!getGroups().contains(orgId)) {
         restTemplate.postForObject(createUrl(ApiEndpoints.USERS),
             new User(orgId.concat(ADMIN_POSTFIX)), String.class, orgId);
+        restTemplate.postForObject(createUrl(ApiEndpoints.USERS),
+            new User(orgId.concat(ADMIN_POSTFIX).concat(TECH_GROUP_POSTFIX)), String.class,
+            orgId.concat(TECH_GROUP_POSTFIX));
       }
     } catch (RestClientException e) {
       throw new AuthorizableGatewayException(String.format("Can't add organization: %s", orgId), e);
@@ -70,7 +75,7 @@ public class HgmGateway implements Authorizable {
     try {
       if (!getUsersFromGroup(orgId).contains(userId)) {
         restTemplate.postForObject(createUrl(ApiEndpoints.USERS), new User(userId), String.class,
-          orgId);
+            orgId);
       } else {
         LOGGER.warn(String.format("Trying to add existing user %s in group %s", userId, orgId));
       }
@@ -85,10 +90,11 @@ public class HgmGateway implements Authorizable {
     try {
       if (getGroups().contains(orgId)) {
         restTemplate.delete(createUrl(ApiEndpoints.GROUP), orgId);
+        restTemplate.delete(createUrl(ApiEndpoints.GROUP), orgId.concat(TECH_GROUP_POSTFIX));
       }
     } catch (RestClientException e) {
       throw new AuthorizableGatewayException(String.format("Can't remove organization: %s", orgId),
-        e);
+          e);
     }
   }
 
@@ -102,17 +108,15 @@ public class HgmGateway implements Authorizable {
       }
     } catch (RestClientException e) {
       throw new AuthorizableGatewayException(String.format("Can't remove user: %s from org: %s",
-        userId, orgId), e);
+          userId, orgId), e);
     }
   }
 
   @Override
-  public void addUser(String userId) throws AuthorizableGatewayException {
-  }
+  public void addUser(String userId) throws AuthorizableGatewayException {}
 
   @Override
-  public void removeUser(String userId) throws AuthorizableGatewayException {
-  }
+  public void removeUser(String userId) throws AuthorizableGatewayException {}
 
   @Override
   public String getName() {
@@ -124,14 +128,16 @@ public class HgmGateway implements Authorizable {
   }
 
   private List<String> getUsersFromGroup(String orgId) {
-    return Arrays.asList(restTemplate.getForObject(createUrl(ApiEndpoints.USERS), String[].class, orgId));
+    return Arrays.asList(restTemplate.getForObject(createUrl(ApiEndpoints.USERS), String[].class,
+        orgId));
   }
 
   private List<String> getGroups() throws AuthorizableGatewayException {
     return Arrays.asList(restTemplate.getForObject(createUrl(ApiEndpoints.GROUPS), String[].class));
   }
 
-  @VisibleForTesting void setGroupMappingServiceUrl(String url) {
+  @VisibleForTesting
+  void setGroupMappingServiceUrl(String url) {
     groupMappingServiceUrl = url;
   }
 

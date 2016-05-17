@@ -42,6 +42,8 @@ public class HdfsGateway implements Authorizable {
 
   private static final String ADMIN_POSTFIX = "_admin";
 
+  private static final String SYS_GROUP_POSTFIX = "_sys";
+
   @Autowired
   private KerberosProperties krbProperties;
 
@@ -59,9 +61,9 @@ public class HdfsGateway implements Authorizable {
     FsPermission usrAllGroupAll = HdfsPermission.USER_ALL_GROUP_ALL.getPermission();
     FsPermission usrAllGroupExec = HdfsPermission.USER_ALL_GROUP_EXECUTE.getPermission();
     List<AclEntry> defaultWithKrbTechUserExec =
-        getDefaultAclWithKrbTechUserAction(FsAction.EXECUTE, FsAction.EXECUTE);
+        getDefaultAclWithKrbTechUserAction(FsAction.EXECUTE, FsAction.EXECUTE, orgId.concat(SYS_GROUP_POSTFIX));
     List<AclEntry> defaultWithTechUserAll =
-        getDefaultAclWithKrbTechUserAction(FsAction.ALL, FsAction.ALL);
+        getDefaultAclWithKrbTechUserAction(FsAction.ALL, FsAction.ALL, orgId.concat(SYS_GROUP_POSTFIX));
     String orgAdmin = orgId.concat(ADMIN_POSTFIX);
 
     try {
@@ -137,10 +139,12 @@ public class HdfsGateway implements Authorizable {
   }
 
   @VisibleForTesting
-  List<AclEntry> getDefaultAclWithKrbTechUserAction(FsAction groupAction, FsAction techUserAction) {
-    return HdfsAclBuilder.newInstanceWithDefaultEntries(groupAction).withUsersAclEntry(ImmutableMap
-            .of(config.getArcadiaUser(), FsAction.EXECUTE, config.getHiveUser(), FsAction.EXECUTE,
-                config.getVcapUser(), FsAction.EXECUTE))
-        .withUserAclEntry(krbProperties.getTechnicalPrincipal(), techUserAction).build();
+  List<AclEntry> getDefaultAclWithKrbTechUserAction(FsAction groupAction, FsAction techUserAction, String sysOrg) {
+    return HdfsAclBuilder.newInstanceWithDefaultEntries(groupAction).withUsersAclEntry(
+        ImmutableMap.of(config.getArcadiaUser(), FsAction.EXECUTE,
+                        config.getHiveUser(), FsAction.EXECUTE,
+                        config.getVcapUser(), FsAction.EXECUTE))
+        .withUserAclEntry(krbProperties.getTechnicalPrincipal(), techUserAction)
+        .withGroupAclEntry(sysOrg, FsAction.EXECUTE).build();
   }
 }
