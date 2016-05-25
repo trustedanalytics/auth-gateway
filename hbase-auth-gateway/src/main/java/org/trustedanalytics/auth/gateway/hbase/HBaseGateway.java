@@ -16,7 +16,6 @@ package org.trustedanalytics.auth.gateway.hbase;
 
 import java.io.IOException;
 
-import org.apache.hadoop.hbase.NamespaceExistException;
 import org.apache.hadoop.hbase.NamespaceNotFoundException;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.security.access.Permission;
