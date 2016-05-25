@@ -2,7 +2,7 @@
 applications:
 - name: auth-gateway
   buildpack: java_buildpack
-  path: target/auth-gateway-0.7.6.jar
+  path: target/auth-gateway-0.7.7.jar
   services:
     - sso
   env:
@@ -29,5 +29,5 @@ applications:
     SENTRY_ADDRESS: placeholder
     SENTRY_PORT: placeholder
     SENTRY_PRINCIPAL: placeholder
-    VERSION: 0.7.6
+    VERSION: 0.7.7
     SPRING_PROFILES_ACTIVE: placeholder
