@@ -5,7 +5,7 @@
     <parent>
         <artifactId>auth-gateway</artifactId>
         <groupId>org.trustedanalytics</groupId>
-        <version>0.8.0</version>
+        <version>0.8.1</version>
     </parent>
 
     <properties>
@@ -134,7 +134,7 @@
         <dependency>
             <groupId>org.trustedanalytics</groupId>
             <artifactId>auth-gateway-spi</artifactId>
-            <version>0.6.1</version>
+            <version>${auth-gateway.version}</version>
         </dependency>
         <dependency>
             <groupId>org.trustedanalytics</groupId>
