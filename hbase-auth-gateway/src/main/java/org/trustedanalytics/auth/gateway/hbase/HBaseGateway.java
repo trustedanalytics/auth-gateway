@@ -54,11 +54,6 @@ public class HBaseGateway implements Authorizable {
     }
 
     @Override
-    public void addUser(String userId) throws AuthorizableGatewayException {
-        // no-operation
-    }
-
-    @Override
     public void addUserToOrg(String userId, String orgId) throws AuthorizableGatewayException {
         // no-operation
     }
@@ -77,12 +72,12 @@ public class HBaseGateway implements Authorizable {
     }
 
     @Override
-    public void removeUser(String userId) throws AuthorizableGatewayException {
+    public void removeUserFromOrg(String userId, String orgId) throws AuthorizableGatewayException {
         // no-operation
     }
 
     @Override
-    public void removeUserFromOrg(String userId, String orgId) throws AuthorizableGatewayException {
+    public void synchronize() throws AuthorizableGatewayException {
         // no-operation
     }
 

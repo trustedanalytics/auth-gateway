@@ -17,13 +17,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
-import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
+import org.trustedanalytics.auth.gateway.cloud.Cloud;
 import org.trustedanalytics.auth.gateway.spi.Authorizable;
+import org.trustedanalytics.auth.gateway.state.State;
 
 import java.util.List;
-import java.util.function.Supplier;
 
 @Configuration
 class EngineConfig {
@@ -37,19 +35,15 @@ class EngineConfig {
     @Autowired
     private List<Authorizable> supportedAuthorizables;
 
-    @Bean
-    public Engine getEngine() {
-        return new Engine(supportedAuthorizables, timeout);
-    }
+    @Autowired
+    private Cloud cloud;
+
+    @Autowired
+    private State state;
 
     @Bean
-    public Supplier<String> getAccessTokenExtractor() {
-        return () -> {
-            OAuth2Authentication oauth2
-                = (OAuth2Authentication) SecurityContextHolder.getContext().getAuthentication();
-            OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) oauth2.getDetails();
-            return details.getTokenValue();
-        };
+    public Engine getEngine() {
+    return new Engine(supportedAuthorizables, timeout, cloud, state);
     }
 
 }

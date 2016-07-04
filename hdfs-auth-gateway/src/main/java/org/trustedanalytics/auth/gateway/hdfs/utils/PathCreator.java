@@ -35,6 +35,8 @@ public class PathCreator {
 
   private static final String TMP = "tmp";
 
+  private static final String SHARED = "shared";
+
   private static final String APP = "apps";
 
   public Path getBrokerPath(String org) {
@@ -51,6 +53,10 @@ public class PathCreator {
 
   public Path getTmpPath(String org) {
     return createPath(ORGS, org, TMP);
+  }
+
+  public Path getSharedPath(String org){
+    return createPath(ORGS, org, SHARED);
   }
 
   public Path getAppPath(String org) {
@@ -72,6 +78,8 @@ public class PathCreator {
   public Path getUserHomePath(String user) {
     return createPath(USER, user);
   }
+
+  public Path getOrgsPath() { return createPath(ORGS); }
 
   private Path createPath(String... args) {
     return getPath(Path.SEPARATOR.concat(String.join(Path.SEPARATOR, args)));

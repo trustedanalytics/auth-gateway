@@ -26,15 +26,13 @@ public interface Authorizable {
 
     void addOrganization(String orgId) throws AuthorizableGatewayException;
 
-    void addUser(String userId) throws AuthorizableGatewayException;
-
     void addUserToOrg(String userId, String orgId) throws AuthorizableGatewayException;
 
     void removeOrganization(String orgId) throws AuthorizableGatewayException;
 
-    void removeUser(String userId) throws AuthorizableGatewayException;
-
     void removeUserFromOrg(String userId, String orgId) throws AuthorizableGatewayException;
+
+    void synchronize() throws AuthorizableGatewayException;
 
     String getName();
 }

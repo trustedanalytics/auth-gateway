@@ -13,7 +13,18 @@
  */
 package org.trustedanalytics.auth.gateway.hgm;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 import org.trustedanalytics.auth.gateway.hgm.entity.User;
 import org.trustedanalytics.auth.gateway.hgm.utils.ApiEndpoints;
 import org.trustedanalytics.auth.gateway.hgm.utils.Qualifiers;
@@ -22,17 +33,6 @@ import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
-
-import java.util.Arrays;
-import java.util.List;
 
 @Configuration
 @Profile({Qualifiers.HTTPS, Qualifiers.KERBEROS})
@@ -48,6 +48,9 @@ public class HgmGateway implements Authorizable {
 
   @Value("${group.mapping.url}")
   private String groupMappingServiceUrl;
+
+  @Value("${group.mapping.supergroup}")
+  private String supergroupName;
 
   @Autowired
   @Qualifier("hgmRestTemplate")
@@ -107,16 +110,29 @@ public class HgmGateway implements Authorizable {
             ImmutableMap.of("user", userId, "group", orgId));
       }
     } catch (RestClientException e) {
-      throw new AuthorizableGatewayException(String.format("Can't remove user: %s from org: %s",
-          userId, orgId), e);
+      throw new AuthorizableGatewayException(
+          String.format("Can't remove user: %s from org: %s", userId, orgId), e);
     }
   }
 
   @Override
-  public void addUser(String userId) throws AuthorizableGatewayException {}
+  public void synchronize() throws AuthorizableGatewayException {
+    LOGGER.debug(String.format("Creating base group mapping"));
 
-  @Override
-  public void removeUser(String userId) throws AuthorizableGatewayException {}
+    createGroupWithUsers("DEPRECATED", Arrays.asList("cf", "h2o", "vcap", "hive"));
+
+    createGroupWithUsers("authgateway", Arrays.asList("authgateway"));
+
+    createGroupWithUsers(supergroupName, Arrays.asList("authgateway", "hdfs", "mapred", "yarn", "impala"));
+
+    createGroupWithUsers("hive", Arrays.asList("arcadia-user"));
+  }
+
+  public void createGroupWithUsers(String groupId, List<String> users) throws AuthorizableGatewayException {
+    addOrganization(groupId);
+    for(String user:users)
+      addUserToOrg(user, groupId);
+  }
 
   @Override
   public String getName() {
@@ -128,8 +144,8 @@ public class HgmGateway implements Authorizable {
   }
 
   private List<String> getUsersFromGroup(String orgId) {
-    return Arrays.asList(restTemplate.getForObject(createUrl(ApiEndpoints.USERS), String[].class,
-        orgId));
+    return Arrays
+        .asList(restTemplate.getForObject(createUrl(ApiEndpoints.USERS), String[].class, orgId));
   }
 
   private List<String> getGroups() throws AuthorizableGatewayException {

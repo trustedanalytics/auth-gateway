@@ -15,6 +15,7 @@ package org.trustedanalytics.auth.gateway.hdfs;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.when;
@@ -22,6 +23,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.AclEntry;
@@ -78,13 +80,19 @@ public class HdfsClientTest {
   }
 
   @Test()
-  public void createDirectory_directoryAlreadyExists_doNothing() throws IOException {
+  public void createDirectory_directoryAlreadyExists_updatePrivileges() throws IOException {
     when(fileSystem.exists(TEST_PATH)).thenReturn(true);
+
+    FileStatus status = mock(FileStatus.class);
+    FsPermission permission = mock(FsPermission.class);
+    when(fileSystem.getFileStatus(TEST_PATH)).thenReturn(status);
+    when(status.getPermission()).thenReturn(userPermission);
+    when(status.getOwner()).thenReturn("test_admin");
 
     hdfsClient.createDirectory(TEST_PATH, "test_admin", "test", userPermission);
     verify(fileSystem, times(0)).mkdirs(TEST_PATH);
-    verify(fileSystem, times(0)).setPermission(TEST_PATH, userPermission);
-    verify(fileSystem, times(0)).setOwner(TEST_PATH, "test_admin", "test");
+    verify(fileSystem).setPermission(TEST_PATH, userPermission);
+    verify(fileSystem).setOwner(TEST_PATH, "test_admin", "test");
   }
 
   @Test

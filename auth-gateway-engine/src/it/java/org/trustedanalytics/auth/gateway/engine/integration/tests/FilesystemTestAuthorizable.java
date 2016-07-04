@@ -13,13 +13,14 @@
  */
 package org.trustedanalytics.auth.gateway.engine.integration.tests;
 
+import org.trustedanalytics.auth.gateway.spi.Authorizable;
+import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
+import org.trustedanalytics.auth.gateway.state.State;
+
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import org.trustedanalytics.auth.gateway.spi.Authorizable;
-import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
 
 /*
  * Authorizable that operates on filesystem made for testing purposes.
@@ -27,6 +28,17 @@ import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
 public class FilesystemTestAuthorizable implements Authorizable {
 
   private static final String SYSTEM_TEMP = System.getProperty("java.io.tmpdir");
+
+  private static final String ORG_NAME = "test_org";
+
+  private static final String USER_NAME = "test_user";
+
+  private State state;
+
+  public FilesystemTestAuthorizable(State state)
+  {
+    this.state = state;
+  }
 
   /**
    * Creates subdirectory in system tmp dir.
@@ -44,18 +56,8 @@ public class FilesystemTestAuthorizable implements Authorizable {
       throw new AuthorizableGatewayException(
           "Unable to create org directory " + dir.toAbsolutePath(), e);
     }
-  }
 
-  @Override
-  public void addUser(String userId) throws AuthorizableGatewayException {
-
-    Path file = FileSystems.getDefault().getPath(SYSTEM_TEMP, userId);
-    try {
-      Files.createFile(file);
-    } catch (IOException e) {
-      throw new AuthorizableGatewayException("Unable to create user file " + file.toAbsolutePath(),
-          e);
-    }
+    state.setValidState(orgId);
   }
 
   @Override
@@ -78,6 +80,9 @@ public class FilesystemTestAuthorizable implements Authorizable {
       throw new AuthorizableGatewayException("Unable to create user file " + file.toAbsolutePath(),
           e);
     }
+
+    state.setValidState(orgId);
+    state.setValidState(orgId, userId);
   }
 
   @Override
@@ -89,17 +94,8 @@ public class FilesystemTestAuthorizable implements Authorizable {
       throw new AuthorizableGatewayException("Unable to delete directory " + dir.toAbsolutePath(),
           e);
     }
-  }
 
-  @Override
-  public void removeUser(String userId) throws AuthorizableGatewayException {
-    Path file = FileSystems.getDefault().getPath(SYSTEM_TEMP, userId);
-    try {
-      Files.deleteIfExists(file);
-    } catch (IOException e) {
-      throw new AuthorizableGatewayException("Unable to delete user file " + file.toAbsolutePath(),
-          e);
-    }
+    state.unsetValidState(orgId);
   }
 
   @Override
@@ -117,6 +113,15 @@ public class FilesystemTestAuthorizable implements Authorizable {
       throw new AuthorizableGatewayException(
           "Unable to delete user file in org" + file.toAbsolutePath(), e);
     }
+
+    state.unsetValidState(orgId);
+    state.unsetValidState(orgId, userId);
+  }
+
+  @Override
+  public void synchronize() throws AuthorizableGatewayException {
+    addOrganization(ORG_NAME);
+    addUserToOrg(ORG_NAME, USER_NAME);
   }
 
   @Override

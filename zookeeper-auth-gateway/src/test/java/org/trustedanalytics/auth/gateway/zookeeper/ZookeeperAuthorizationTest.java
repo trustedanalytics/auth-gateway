@@ -62,11 +62,6 @@ public class ZookeeperAuthorizationTest {
   }
 
   @Test
-  public void addUser_noOperation_invokedWithoutExceptions() throws Exception {
-    zookeeperGateway.addUser("id");
-  }
-
-  @Test
   public void addUserToOrg_orgExists_aclAdded() throws Exception {
     zookeeperGateway.addUserToOrg(USER, ORG_ID);
     verify(zkClient).addUserToAcl(ORG_ID, USER, ZookeeperPermission.CRDW);
@@ -105,11 +100,6 @@ public class ZookeeperAuthorizationTest {
     doThrow(new Exception()).when(zkClient).deleteZnode(ORG_ID);
     zookeeperGateway.removeOrganization(ORG_ID);
     verify(zkClient).deleteZnode(ORG_ID);
-  }
-
-  @Test
-  public void removeUser_noOperation_invokedWithoutExceptions() throws Exception {
-    zookeeperGateway.removeUser("id");
   }
 
   @Test

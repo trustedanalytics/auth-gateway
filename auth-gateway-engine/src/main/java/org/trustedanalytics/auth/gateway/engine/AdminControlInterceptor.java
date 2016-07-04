@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import javax.servlet.http.HttpServletRequest;
@@ -57,8 +58,11 @@ public class AdminControlInterceptor extends HandlerInterceptorAdapter {
         .build();
 
     JwtContext context = jwtConsumer.process(tokenExtractor.get());
-    JwtClaims claims = context.getJwtClaims();
-    List<String> extractedScopes = (List<String>)claims.getClaimsMap().get("scope");
-    return extractedScopes.contains(UBER_ADMIN_SCOPE);
+
+    return Optional.ofNullable(context.getJwtClaims())
+            .map(claim -> claim.getClaimsMap())
+            .map(claimsMap -> claimsMap.get("scope"))
+            .filter(scopes -> scopes.toString().contains(UBER_ADMIN_SCOPE))
+            .isPresent();
   }
 }

@@ -10,7 +10,9 @@ applications:
     KRB_REALM: placeholder
     KRB_USER: placeholder
     KRB_PASSWORD: placeholder
+    KRB_ENABLED: placeholder
     ZK_CLUSTER_URL: placeholder
+    ZK_PASSWORD: placeholder
     HADOOP_PROVIDED_ZIP: placeholder
     HBASE_PROVIDED_ZIP: placeholder
     HDFS_SUPERUSER: placeholder

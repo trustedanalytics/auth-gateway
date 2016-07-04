@@ -4,7 +4,7 @@
     <parent>
         <artifactId>auth-gateway</artifactId>
         <groupId>org.trustedanalytics</groupId>
-        <version>0.7.9</version>
+        <version>0.7.10</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -13,7 +13,7 @@
 
     <properties>
         <jacoco-measurement-instructions>0.6000</jacoco-measurement-instructions>
-        <jacoco-measurement-branches>0.7500</jacoco-measurement-branches>
+        <jacoco-measurement-branches>0.5600</jacoco-measurement-branches>
         <jacoco-measurement-lines>0.6000</jacoco-measurement-lines>
         <jacoco-measurement-classes>0.7200</jacoco-measurement-classes>
     </properties>

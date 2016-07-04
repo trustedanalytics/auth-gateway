@@ -12,13 +12,17 @@
  * the License.
  */
 
+
 package org.trustedanalytics.auth.gateway.zookeeper.integration;
 
+import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.retry.RetryNTimes;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.trustedanalytics.auth.gateway.zookeeper.client.KerberosfulZookeeperClient;
+import org.trustedanalytics.auth.gateway.zookeeper.client.ZookeeperClient;
 import org.trustedanalytics.auth.gateway.zookeeper.integration.testserver.SaslTestingServer;
-import org.trustedanalytics.auth.gateway.zookeeper.kerberos.KerberosProperties;
 import org.trustedanalytics.auth.gateway.zookeeper.integration.zkoperations.ZookeeperTestOperations;
 
 import java.io.IOException;
@@ -48,13 +52,12 @@ public class WithSASLIntegrationTest extends IntegrationTestBase {
     return zookeeperTestServer.getConnectionString();
   }
 
-  @Override
-  protected Function<CuratorFrameworkFactory.Builder, CuratorFrameworkFactory.Builder> getCustomCuratorBuilderSteps() {
-    return (curatorBuilder) -> curatorBuilder.authorization("backdoor", null);
-  }
-
-  @Override
-  protected KerberosProperties getKrbProperties() {
-    return new KerberosProperties("fake.kdc.host", "FAKE_REALM", "adminUser", "adminPass");
-  }
+    @Override
+    protected ZookeeperClient getZookeeperClient(String rootNode) {
+        Function<CuratorFrameworkFactory.Builder, CuratorFrameworkFactory.Builder> customBuilder = Function.identity();
+        CuratorFramework curatorFramework = customBuilder.apply(CuratorFrameworkFactory.builder().retryPolicy(new RetryNTimes(3, 1000))
+                .connectString(getZkTestServerConnectionString()).authorization("backdoor", null)).build();
+        curatorFramework.start();
+        return new KerberosfulZookeeperClient(curatorFramework, rootNode);
+    }
 }

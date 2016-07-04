@@ -14,7 +14,6 @@
 
 package org.trustedanalytics.auth.gateway.zookeeper.integration;
 
-import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Id;
 import org.junit.After;
@@ -23,30 +22,20 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.trustedanalytics.auth.gateway.spi.Authorizable;
+import org.trustedanalytics.auth.gateway.zookeeper.ZookeeperGateway;
+import org.trustedanalytics.auth.gateway.zookeeper.client.ZookeeperClient;
 import org.trustedanalytics.auth.gateway.zookeeper.client.ZookeeperPermission;
-import org.trustedanalytics.auth.gateway.zookeeper.config.ZookeeperAuthorizationEnv;
-import org.trustedanalytics.auth.gateway.zookeeper.config.ZookeeperGatewayFactory;
 import org.trustedanalytics.auth.gateway.zookeeper.integration.zkoperations.ZookeeperTestOperations;
-import org.trustedanalytics.auth.gateway.zookeeper.kerberos.KerberosClient;
-import org.trustedanalytics.auth.gateway.zookeeper.kerberos.KerberosProperties;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
-
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public abstract class IntegrationTestBase {
 
-  @Mock
-  private KerberosClient krbClient;
-
-  @Mock
-  private ZookeeperAuthorizationEnv env;
+    private static final String USERNAME = "username";
 
   private String rootNode;
   private ZookeeperTestOperations zkTestOperations;
@@ -62,24 +51,14 @@ public abstract class IntegrationTestBase {
     zkTestOperations = getZkTestOperations();
     zkTestOperations.createNode(rootNode);
 
-    // mocked environment
-    KerberosProperties krbProperties = getKrbProperties();
-    when(env.zookeeperRootNode()).thenReturn(rootNode);
-    when(env.kerberosProperties()).thenReturn(krbProperties);
-    when(env.zookeeperQuorum()).thenReturn(getZkTestServerConnectionString());
-    when(krbClient.login(krbProperties)).thenReturn(krbProperties.isValid());
-
-    sut = ZookeeperGatewayFactory.newInstance(env, krbClient, getCustomCuratorBuilderSteps())
-        .create();
+    sut = new ZookeeperGateway(getZookeeperClient(rootNode), USERNAME);
   }
 
   protected abstract ZookeeperTestOperations getZkTestOperations();
 
   protected abstract String getZkTestServerConnectionString();
 
-  protected abstract Function<CuratorFrameworkFactory.Builder, CuratorFrameworkFactory.Builder> getCustomCuratorBuilderSteps();
-
-  protected abstract KerberosProperties getKrbProperties();
+  protected abstract ZookeeperClient getZookeeperClient(String rootNode);
 
   @After
   public void tearDown() throws Exception {
@@ -97,7 +76,7 @@ public abstract class IntegrationTestBase {
 
     // assert
     zkTestOperations.assertNodeExists(rootNode + "/" + orgId,
-        withAcl(ZookeeperPermission.CRDWA, getKrbProperties().getUser()));
+        withAcl(ZookeeperPermission.CRDWA, USERNAME));
   }
 
   @Test
@@ -114,7 +93,7 @@ public abstract class IntegrationTestBase {
 
     // assert
     zkTestOperations.assertNodeExists(rootNode + "/" + orgId,
-        withAcl(ZookeeperPermission.CRDWA, getKrbProperties().getUser()));
+        withAcl(ZookeeperPermission.CRDWA, USERNAME));
   }
 
   @Test
@@ -131,7 +110,7 @@ public abstract class IntegrationTestBase {
 
     // assert
     zkTestOperations.assertNodeExists(rootNode + "/" + orgId, withAcls(ZookeeperPermission.CRDWA,
-        getKrbProperties().getUser(), ZookeeperPermission.CRDW, userId));
+            USERNAME, ZookeeperPermission.CRDW, userId));
   }
 
   @Test
@@ -150,7 +129,7 @@ public abstract class IntegrationTestBase {
 
     // assert
     zkTestOperations.assertNodeExists(rootNode + "/" + orgId, withAcls(ZookeeperPermission.CRDWA,
-        getKrbProperties().getUser(), ZookeeperPermission.CRDW, userId));
+            USERNAME, ZookeeperPermission.CRDW, userId));
   }
 
   @Test
@@ -169,7 +148,7 @@ public abstract class IntegrationTestBase {
 
     // assert
     zkTestOperations.assertNodeExists(rootNode + "/" + orgId,
-        withAcls(ZookeeperPermission.CRDWA, getKrbProperties().getUser(), ZookeeperPermission.CRDW,
+        withAcls(ZookeeperPermission.CRDWA, USERNAME, ZookeeperPermission.CRDW,
             userId1, ZookeeperPermission.CRDW, userId2));
   }
 
@@ -190,7 +169,7 @@ public abstract class IntegrationTestBase {
 
     // assert
     zkTestOperations.assertNodeExists(rootNode + "/" + orgId, withAcls(ZookeeperPermission.CRDWA,
-        getKrbProperties().getUser(), ZookeeperPermission.CRDW, userId2));
+            USERNAME, ZookeeperPermission.CRDW, userId2));
   }
 
   @Test
@@ -212,7 +191,7 @@ public abstract class IntegrationTestBase {
 
     // assert
     zkTestOperations.assertNodeExists(rootNode + "/" + orgId, withAcls(ZookeeperPermission.CRDWA,
-        getKrbProperties().getUser(), ZookeeperPermission.CRDW, userId2));
+            USERNAME, ZookeeperPermission.CRDW, userId2));
   }
 
   @Test

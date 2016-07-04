@@ -33,8 +33,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.Resource;
-
 @Component
 public class OAuth2Helper {
 

@@ -11,6 +11,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
+
 package org.trustedanalytics.auth.gateway.zookeeper;
 
 import org.trustedanalytics.auth.gateway.spi.Authorizable;
@@ -38,11 +39,6 @@ public class ZookeeperGateway implements Authorizable {
   }
 
   @Override
-  public void addUser(String userId) throws AuthorizableGatewayException {
-    // no-operation
-  }
-
-  @Override
   public void addUserToOrg(String userId, String orgId) throws AuthorizableGatewayException {
     try {
       zkClient.addUserToAcl(orgId, userId, ZookeeperPermission.CRDW);
@@ -61,11 +57,6 @@ public class ZookeeperGateway implements Authorizable {
   }
 
   @Override
-  public void removeUser(String userId) throws AuthorizableGatewayException {
-    // no-operation
-  }
-
-  @Override
   public void removeUserFromOrg(String userId, String orgId) throws AuthorizableGatewayException {
     try {
       zkClient.removeUserFromAcl(orgId, userId);
@@ -73,6 +64,9 @@ public class ZookeeperGateway implements Authorizable {
       throw new AuthorizableGatewayException(failMsg("modifying znode ACLs"), e);
     }
   }
+
+  @Override
+  public void synchronize() throws AuthorizableGatewayException {}
 
   private String failMsg(String failureReason) {
     return "Zookeeper auth gateway failed on " + failureReason;

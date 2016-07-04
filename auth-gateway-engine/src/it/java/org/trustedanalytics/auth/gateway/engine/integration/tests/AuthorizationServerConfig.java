@@ -13,6 +13,7 @@
  */
 package org.trustedanalytics.auth.gateway.engine.integration.tests;
 
+import org.apache.curator.test.TestingServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,9 @@ import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenCo
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AuthorizationServerConfig.class);
+
+  @Autowired
+  private TestingServer zookeeperServerFactory;
 
   @Value("${jwt.token.publicKey}")
   private String publicKey;

@@ -11,28 +11,23 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
+package org.trustedanalytics.auth.gateway.engine.integration.tests;
 
-package org.trustedanalytics.auth.gateway.zookeeper.kerberos;
+import org.apache.curator.test.TestingServer;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-import com.google.common.base.Strings;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+@Configuration
+public class ZookeeperServerFactory {
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class KerberosProperties {
+    public ZookeeperServerFactory() { }
 
-  private String kdc;
-  private String realm;
-  private String user;
-  private String password;
+    @Bean
+    public TestingServer initEmbededZKServer() throws Exception {
+        TestingServer zkServer = new TestingServer(2181);
+        zkServer.start();
 
-  public boolean isValid() {
-    return !(Strings.isNullOrEmpty(kdc) || Strings.isNullOrEmpty(realm)
-        || Strings.isNullOrEmpty(user) || Strings.isNullOrEmpty(password));
-  }
+        return zkServer;
+    }
 }
-
-

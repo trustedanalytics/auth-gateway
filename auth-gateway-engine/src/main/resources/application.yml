@@ -2,6 +2,24 @@ security:
     ignored: /v2/api-docs
 engine:
   timeout: 30
+  asyncTimeout: 1000
+  version: ${version:UNKNOWN}
+cloud:
+    api: ${vcap.services.sso.credentials.apiEndpoint}
+    clientId: ${vcap.services.sso.credentials.clientId}
+    clientPassword: ${vcap.services.sso.credentials.clientSecret}
+    uaa: ${vcap.services.sso.credentials.uaaUri}
+zookeeper:
+  clusterUrl: ${zk.cluster.url:}
+  user: ${krb.user:}
+  password: ${zk.password:authgateway}
+  node: ${zk.node:/auth-gateway}
+kerberos:
+  user: ${krb.user:}
+  password: ${krb.password:}
+  kdc: ${krb.kdc:}
+  realm: ${krb.realm:}
+  enabled: ${krb.enabled:false}
 hdfs:
   superUser: ${hdfs.superuser:}
   clientKeytab: ${hdfs.keytab:}
@@ -15,6 +33,7 @@ yarn:
     host: ${cloudera.address:}
     port: ${cloudera.port:}
 group.mapping:
+  supergroup: ${hgm.supergroup:supergroup}
   url: ${hgm.url}
   kerberos:
     principal: ${hgm.principal:}

@@ -37,29 +37,60 @@ final class HdfsAclBuilder {
         .entrySet()
         .stream()
         .forEach(
-            entry -> aclEntryList.add(getNamedAclEntry(entry.getKey(), entry.getValue(),
+            entry -> aclEntryList.add(getNamedAclEntry(AclEntryScope.ACCESS, entry.getKey(), entry.getValue(),
                 AclEntryType.USER)));
+    return this;
+  }
+
+  public HdfsAclBuilder withDefaultUsersAclEntry(Map<String, FsAction> usersAclEntry) {
+    usersAclEntry
+            .entrySet()
+            .stream()
+            .forEach(
+                    entry -> aclEntryList.add(getNamedAclEntry(AclEntryScope.DEFAULT, entry.getKey(), entry.getValue(),
+                            AclEntryType.USER)));
     return this;
   }
 
   public HdfsAclBuilder withUsersAclEntry(List<String> users, FsAction fsAction) {
     users.stream().forEach(
-        user -> aclEntryList.add(getNamedAclEntry(user, fsAction, AclEntryType.USER)));
+        user -> aclEntryList.add(getNamedAclEntry(AclEntryScope.ACCESS, user, fsAction, AclEntryType.USER)));
+    return this;
+  }
+
+  public HdfsAclBuilder withDefaultUsersAclEntry(List<String> users, FsAction fsAction) {
+    users.stream().forEach(
+            user -> aclEntryList.add(getNamedAclEntry(AclEntryScope.DEFAULT, user, fsAction, AclEntryType.USER)));
     return this;
   }
 
   public HdfsAclBuilder withUserAclEntry(String user, FsAction fsAction) {
-    aclEntryList.add(getNamedAclEntry(user, fsAction, AclEntryType.USER));
+    aclEntryList.add(getNamedAclEntry(AclEntryScope.ACCESS, user, fsAction, AclEntryType.USER));
+    return this;
+  }
+
+  public HdfsAclBuilder withDefaultUserAclEntry(String user, FsAction fsAction) {
+    aclEntryList.add(getNamedAclEntry(AclEntryScope.DEFAULT, user, fsAction, AclEntryType.USER));
     return this;
   }
 
   public HdfsAclBuilder withGroupAclEntry(String user, FsAction fsAction) {
-    aclEntryList.add(getNamedAclEntry(user, fsAction, AclEntryType.GROUP));
+    aclEntryList.add(getNamedAclEntry(AclEntryScope.ACCESS, user, fsAction, AclEntryType.GROUP));
+    return this;
+  }
+
+  public HdfsAclBuilder withDefaultGroupAclEntry(String user, FsAction fsAction) {
+    aclEntryList.add(getNamedAclEntry(AclEntryScope.DEFAULT, user, fsAction, AclEntryType.GROUP));
     return this;
   }
 
   public HdfsAclBuilder withAclEntry(FsAction action, AclEntryType aclEntry) {
-    aclEntryList.add(getAclEntry(action, aclEntry));
+    aclEntryList.add(getAclEntry(AclEntryScope.ACCESS, action, aclEntry));
+    return this;
+  }
+
+  public HdfsAclBuilder withDefaultAclEntry(FsAction action, AclEntryType aclEntry) {
+    aclEntryList.add(getAclEntry(AclEntryScope.DEFAULT, action, aclEntry));
     return this;
   }
 
@@ -68,13 +99,13 @@ final class HdfsAclBuilder {
     return this.aclEntryList;
   }
 
-  private AclEntry getNamedAclEntry(String user, FsAction action, AclEntryType aclEntryType) {
-    return new AclEntry.Builder().setName(user).setScope(AclEntryScope.ACCESS)
+  private AclEntry getNamedAclEntry(AclEntryScope scope, String user, FsAction action, AclEntryType aclEntryType) {
+    return new AclEntry.Builder().setName(user).setScope(scope)
         .setPermission(action).setType(aclEntryType).build();
   }
 
-  private AclEntry getAclEntry(FsAction action, AclEntryType group) {
-    return new AclEntry.Builder().setScope(AclEntryScope.ACCESS).setPermission(action)
+  private AclEntry getAclEntry(AclEntryScope scope, FsAction action, AclEntryType group) {
+    return new AclEntry.Builder().setScope(scope).setPermission(action)
         .setType(group).build();
   }
 

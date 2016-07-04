@@ -42,19 +42,16 @@ public class OrgWarehouseClient implements Authorizable {
   }
 
   @Override
-  public void addUser(String userId) throws AuthorizableGatewayException {}
-
-  @Override
   public void addUserToOrg(String userId, String orgId) throws AuthorizableGatewayException {}
 
   @Override
   public void removeOrganization(String orgId) throws AuthorizableGatewayException {}
 
   @Override
-  public void removeUser(String userId) throws AuthorizableGatewayException {}
+  public void removeUserFromOrg(String userId, String orgId) throws AuthorizableGatewayException {}
 
   @Override
-  public void removeUserFromOrg(String userId, String orgId) throws AuthorizableGatewayException {}
+  public void synchronize() throws AuthorizableGatewayException {}
 
   @Override
   public String getName() {

@@ -14,24 +14,46 @@
 
 package org.trustedanalytics.auth.gateway.zookeeper.config;
 
+import org.apache.curator.framework.CuratorFramework;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.trustedanalytics.auth.gateway.spi.Authorizable;
-import org.trustedanalytics.auth.gateway.zookeeper.kerberos.KerberosClient;
+import org.trustedanalytics.auth.gateway.zookeeper.ZookeeperGateway;
+import org.trustedanalytics.auth.gateway.zookeeper.client.KerberosfulZookeeperClient;
+import org.trustedanalytics.auth.gateway.zookeeper.client.KerberoslessZookeeperClient;
+import org.trustedanalytics.auth.gateway.zookeeper.client.ZookeeperClient;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
-import java.util.function.Function;
 
 @Configuration
 @Profile("zookeeper-auth-gateway")
 public class ZookeeperGatewayConfig {
 
+  private static final String BASE_NODE = "/org";
+
+  @Autowired
+  private CuratorFramework curatorFramework;
+
+  @Value("${kerberos.enabled}")
+  private boolean kerberos;
+
+  @Value("${zookeeper.user}")
+  private String username;
+
+  private ZookeeperClient getZookeeperClient()
+  {
+    if(kerberos)
+      return new KerberosfulZookeeperClient(curatorFramework, BASE_NODE);
+    else
+      return new KerberoslessZookeeperClient(curatorFramework, BASE_NODE);
+  }
+
   @Bean
   public Authorizable zookeeperGateway() throws IOException, LoginException {
-    return ZookeeperGatewayFactory
-        .newInstance(new ZookeeperAuthorizationEnv(), new KerberosClient(), Function.identity())
-        .create();
+    return new ZookeeperGateway(getZookeeperClient(), username);
   }
 }

@@ -1,5 +1,23 @@
 engine:
   timeout: 10
+  asyncTimeout: 0
+  version: SOME_RAND
+cloud:
+    api: ${vcap.services.sso.credentials.apiEndpoint:localhost:80808}
+    clientId: ${vcap.services.sso.credentials.clientId:admin}
+    clientPassword: ${vcap.services.sso.credentials.clientPassword:admin}
+    uaa: ${vcap.services.sso.credentials.uaaUri:localhost:8080}
+zookeeper:
+  clusterUrl: ${zk.cluster.url:localhost:2181}
+  user: ${hdfs.superuser:}
+  password: ${zk.password:authgateway}
+  node: ${zk.node:/auth-gateway}
+kerberos:
+  user: ${krb.user:none}
+  password: ${krb.password:null}
+  kdc: ${krb.kdc:}
+  realm: ${krb.realm:}
+  enabled: ${krb.enabled:false}
 hdfs:
   superUser: ${hdfs.superuser:}
   clientKeytab: ${hdfs.keytab:}

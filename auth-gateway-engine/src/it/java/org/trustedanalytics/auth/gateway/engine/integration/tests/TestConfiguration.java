@@ -13,18 +13,23 @@
  */
 package org.trustedanalytics.auth.gateway.engine.integration.tests;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.trustedanalytics.auth.gateway.spi.Authorizable;
+import org.trustedanalytics.auth.gateway.state.State;
 
 @Configuration
 @PropertySource("classpath:application-test.yml")
 public class TestConfiguration {
 
+    @Autowired
+    private State state;
+
     @Bean
     public Authorizable authorizable() {
-        return new FilesystemTestAuthorizable();
+        return new FilesystemTestAuthorizable(state);
     }
 
 }

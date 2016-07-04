@@ -23,9 +23,11 @@ public class HdfsPermission {
       new HdfsPermission(new FsPermission(FsAction.ALL, FsAction.ALL, FsAction.NONE));
   public static final HdfsPermission USER_ALL_GROUP_EXECUTE =
       new HdfsPermission(new FsPermission(FsAction.ALL, FsAction.EXECUTE, FsAction.NONE));
+  public static final HdfsPermission USER_ALL_GROUP_READ =
+      new HdfsPermission(new FsPermission(FsAction.ALL, FsAction.READ_EXECUTE, FsAction.NONE));
 
   private FsPermission permission;
-  
+
   private HdfsPermission(FsPermission permission) {
     this.permission = permission;
   }

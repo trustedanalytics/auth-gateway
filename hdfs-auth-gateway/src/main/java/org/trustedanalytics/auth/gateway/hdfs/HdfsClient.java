@@ -13,15 +13,22 @@
  */
 package org.trustedanalytics.auth.gateway.hdfs;
 
-import java.io.IOException;
-import java.util.List;
-
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.RemoteIterator;
 import org.apache.hadoop.fs.permission.AclEntry;
+import org.apache.hadoop.fs.permission.AclEntryScope;
+import org.apache.hadoop.fs.permission.FsAction;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class HdfsClient {
 
@@ -38,18 +45,49 @@ public class HdfsClient {
   }
 
   public void createDirectory(Path path, String user, String group, FsPermission permission)
-      throws IOException {
+          throws IOException {
     if (!fileSystem.exists(path)) {
       fileSystem.mkdirs(path);
       fileSystem.setPermission(path, permission);
       fileSystem.setOwner(path, user, group);
     } else {
       LOGGER.warn(String.format("Path already exists: %s", path));
+      updateDirectory(path, group, permission);
+    }
+  }
+
+  public void updateDirectory(Path path, String group, FsPermission permission) throws IOException {
+    FileStatus status = fileSystem.getFileStatus(path);
+    FsPermission fsPermission = status.getPermission();
+
+    FsAction userAction = fsPermission.getUserAction().or(permission.getUserAction());
+    FsAction groupAction = fsPermission.getGroupAction().or(permission.getGroupAction());
+    FsAction otherAction = fsPermission.getOtherAction().or(permission.getOtherAction());
+    fsPermission = new FsPermission(userAction, groupAction, otherAction);
+    fileSystem.setPermission(path, fsPermission);
+
+    fileSystem.setOwner(path, status.getOwner(), group);
+  }
+
+  public void updateDirectoryWithSubdirectories(Path path, String group, FsPermission permission)
+          throws IOException {
+    List<FileStatus> childrens = getAllChildens(path, true);
+
+    for(FileStatus children:childrens) {
+      updateDirectory(children.getPath(), group, permission);
+    }
+  }
+
+  public void setACLForDirectoryWithSubdirectories(Path path, List<AclEntry> aclEntries) throws IOException {
+    List<FileStatus> childrens = getAllChildens(path, true);
+
+    for(FileStatus children:childrens) {
+      setACLForDirectory(children.getPath(), aclEntries);
     }
   }
 
   public void createDirectoryWithAcl(Path path, String user, String group, FsPermission permission, List<AclEntry> aclEntries)
-      throws IOException {
+          throws IOException {
     createDirectory(path, user, group, permission);
     setACLForDirectory(path, aclEntries);
   }
@@ -63,6 +101,26 @@ public class HdfsClient {
   }
 
   public void setACLForDirectory(Path path, List<AclEntry> aclEntries) throws IOException {
-    fileSystem.modifyAclEntries(path, aclEntries);
+    if(fileSystem.isDirectory(path)) {
+      fileSystem.modifyAclEntries(path, aclEntries);
+    }
+    else {
+      fileSystem.modifyAclEntries(path, aclEntries.stream().filter(acl -> acl.getScope() != AclEntryScope.DEFAULT)
+              .collect(Collectors.toList()));
+    }
+  }
+
+  private List<FileStatus> getAllChildens(Path path, boolean recursive) throws IOException {
+    List<FileStatus> files = new ArrayList<>();
+    FileStatus statuses[] = fileSystem.listStatus(path);
+
+    for(FileStatus status: statuses)
+    {
+      files.add(status);
+      if(status.isDirectory() && recursive)
+        files.addAll(getAllChildens(status.getPath(), recursive));
+    }
+
+    return files;
   }
 }

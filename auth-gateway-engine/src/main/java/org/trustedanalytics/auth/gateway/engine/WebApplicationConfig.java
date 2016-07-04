@@ -13,14 +13,14 @@
  */
 package org.trustedanalytics.auth.gateway.engine;
 
-import java.util.function.Supplier;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+
+import java.util.function.Supplier;
 
 @Configuration
 public class WebApplicationConfig extends WebMvcConfigurerAdapter {
@@ -34,6 +34,6 @@ public class WebApplicationConfig extends WebMvcConfigurerAdapter {
   public void addInterceptors(InterceptorRegistry registry) {
     LOGGER.info("Register access control interceptor");
     registry.addInterceptor(new AdminControlInterceptor(tokenExtractor))
-        .addPathPatterns("/users/**", "/organizations/**");
+        .addPathPatterns("/users/**", "/organizations/**", "/synchronize**", "/state**", "/jobs/**");
   }
 }
